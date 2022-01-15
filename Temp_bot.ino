@@ -11,7 +11,6 @@
 ESP8266WebServer HTTP(80);
 ESP8266HTTPUpdateServer httpUpdater;
 AsyncTelegram myBot;
-
 const char* token = "**********:***********************************";
 const char* www_username = "Esp_TempBot";
 const char* www_password = "5031122379";
