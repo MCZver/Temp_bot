@@ -10,7 +10,7 @@ const formatDate = (date) => {
 const formatDateToResponse = (date) => date.toISOString().split('T')[0];
 
 // Пример функции для преобразования кодов погоды в описания
-const weatherCodeToDescription = (code) => {
+const weatherCodeToDescription_ru = (code) => {
     switch (code) {
         case 0: return "Ясно";
         case 1: return "Малоблачно";
@@ -44,6 +44,40 @@ const weatherCodeToDescription = (code) => {
     }
 };
 
+const weatherCodeToDescription_ua = (code) => {
+    switch (code) {
+        case 0: return "Ясно";
+        case 1: return "Малохмарно";
+        case 2: return "Хмарно";
+        case 3: return "Змінна хмарність";
+        case 45: return "Туман";
+        case 48: return "Заморозки туману";
+        case 51: return "Легкий дощ";
+        case 53: return "Помірний дощ";
+        case 55: return "Можливий дощ";
+        case 56: return "Легкий дощ із льодом";
+        case 57: return "Можливий дощ з льодом";
+        case 61: return "Легкий дощ з опадами";
+        case 63: return "Помірний дощ з опадами";
+        case 65: return "Можливий дощ з опадами";
+        case 66: return "Легкий дощ із льодом та опадами";
+        case 67: return "Сильний дощ із льодом та опадами";
+        case 71: return "Легкий сніг";
+        case 73: return "Помірний сніг";
+        case 75: return "Сильний сніг";
+        case 77: return "Легкі сніжинки";
+        case 80: return "Легкий дощ та опади";
+        case 81: return "Помірний дощ та опади";
+        case 82: return "Можливий дощ та опади";
+        case 85: return "Легкий снігопад";
+        case 86: return "Сильний снігопад";
+        case 95: return "Гроза";
+        case 96: return "Гроза з легким дощем";
+        case 99: return "Гроза із сильним дощем";
+        default: return "Невідомо";
+    }
+};
+
 // Функция для расчета среднего значения влажности для каждого дня
 const calculateDailyAverageHumidity = (hourlyHumidity, hourlyTimes, date) => {
     const dateStart = new Date(date);
@@ -74,7 +108,7 @@ window.addEventListener('DOMContentLoaded', async () => {
 		window.Telegram.WebApp.ready();
             window.Telegram.WebApp.expand();
             // Получение языка пользователя
-            //const userLanguage = window.Telegram.WebApp.initDataUnsafe.user.language_code || 'ru';
+            const userLanguage = window.Telegram.WebApp.initDataUnsafe.user.language_code || 'ru';
 			console.log(window.Telegram.WebApp);
 		
         // Получение текущей даты и даты через два дня
@@ -125,21 +159,41 @@ window.addEventListener('DOMContentLoaded', async () => {
             button.onclick = () => showWeather(index);
             buttonsContainer.appendChild(button);
 
-            const weatherHtml = `
+            const weatherHtml_ru = `
                 <div id="date-${index}" class="weather-info" style="display: none;">
                     <h2>${formatDate(new Date(date))}</h2>
-                    <p><strong>Описание погоды:</strong> ${weatherCodeToDescription(weather_code[index])}</p>
+                    <p><strong>Описание погоды:</strong> ${weatherCodeToDescription_ru(weather_code[index])}</p>
                     <p><strong>Макс. температура:</strong> ${temperature_2m_max[index]}°C</p>
                     <p><strong>Мин. температура:</strong> ${temperature_2m_min[index]}°C</p>
-                    <p><strong>Макс. ощущаемая температура:</strong> ${apparent_temperature_max[index]}°C</p>
-                    <p><strong>Мин. ощущаемая температура:</strong> ${apparent_temperature_min[index]}°C</p>
+                    <p><strong>Макс. температура по ощущениям:</strong> ${apparent_temperature_max[index]}°C</p>
+                    <p><strong>Мин. температура по ощущениям:</strong> ${apparent_temperature_min[index]}°C</p>
                     <p><strong>Вероятность осадков:</strong> ${precipitation_probability_max[index]}%</p>
                     <p><strong>Макс. скорость ветра:</strong> ${wind_speed_10m_max[index]} км/ч</p>
                     <p><strong>Средняя влажность:</strong> ${calculateDailyAverageHumidity(hourlyHumidity, hourlyTimes, date)}%</p>
                 </div>
             `;
-
-            weatherDataContainer.insertAdjacentHTML('beforeend', weatherHtml);
+			
+			const weatherHtml_ua = `
+                <div id="date-${index}" class="weather-info" style="display: none;">
+                    <h2>${formatDate(new Date(date))}</h2>
+                    <p><strong>Описание погоды:</strong> ${weatherCodeToDescription_ua(weather_code[index])}</p>
+                    <p><strong>Макс. температура:</strong> ${temperature_2m_max[index]}°C</p>
+                    <p><strong>Мін. температура:</strong> ${temperature_2m_min[index]}°C</p>
+                    <p><strong>Макс. температура по відчуттям:</strong> ${apparent_temperature_max[index]}°C</p>
+                    <p><strong>Мин. температура по відчуттям:</strong> ${apparent_temperature_min[index]}°C</p>
+                    <p><strong>Можливість опадів:</strong> ${precipitation_probability_max[index]}%</p>
+                    <p><strong>Макс. швидкість вітру:</strong> ${wind_speed_10m_max[index]} км/ч</p>
+                    <p><strong>Середня вологість:</strong> ${calculateDailyAverageHumidity(hourlyHumidity, hourlyTimes, date)}%</p>
+                </div>
+            `;
+			
+			if(userLanguage === ru) {
+				weatherDataContainer.insertAdjacentHTML('beforeend', weatherHtml_ru);
+			}
+			if(userLanguage === ua) {
+				weatherDataContainer.insertAdjacentHTML('beforeend', weatherHtml_ua);
+			}
+            
         });
 
         // Показать данные для первого дня по умолчанию
