@@ -104,6 +104,7 @@ function showWeather(index) {
 // Инициализация данных при загрузке страницы
 window.addEventListener('DOMContentLoaded', async () => {
     try {
+	let buttonLabels = [];
 	window.Telegram.WebApp.ready();
         window.Telegram.WebApp.expand();
         // Получение языка пользователя
@@ -158,20 +159,22 @@ window.addEventListener('DOMContentLoaded', async () => {
 		const titleContainer = document.getElementById('title');
 		if(userLanguage === "ru") {
 				titleContainer.insertAdjacentHTML('beforeend', 'Прогноз погоды');
+				buttonLabels = ['Сегодня', 'Завтра', 'Послезавтра'];
 			}
 			if(userLanguage === "uk") {
 				titleContainer.insertAdjacentHTML('beforeend', 'Прогноз погоди');
+				buttonLabels = ['Сьогодні', 'Завтра', 'Післязавтра'];
 			}
 
         time.forEach((date, index) => {
             const button = document.createElement('button');
-            button.innerText = formatDate(new Date(date));
+            button.innerText = buttonLabels[index];
             button.onclick = () => showWeather(index);
             buttonsContainer.appendChild(button);
 
             const weatherHtml_ru = `
                 <div id="date-${index}" class="weather-info" style="display: none;">
-                    <h2 class="date-heading">${formatDate(new Date(date))}</h2>
+                    <h2 class="date-heading">${formatDate(new Date(date))} (${buttonLabels[index]})</h2>
 					<div class="weather-details">
 						<p><strong>Описание погоды:</strong> ${weatherCodeToDescription_ru(weather_code[index])}</p>
 						<p><strong>Макс. температура:</strong> ${temperature_2m_max[index]}°C</p>
@@ -187,7 +190,7 @@ window.addEventListener('DOMContentLoaded', async () => {
 			
 			const weatherHtml_ua = `
                 <div id="date-${index}" class="weather-info" style="display: none;">
-                    <h2 class="date-heading">${formatDate(new Date(date))}</h2>
+                    <h2 class="date-heading">${formatDate(new Date(date))} (${buttonLabels[index]})</h2>
 					<div class="weather-details">
 						<p><strong>Опис погоди:</strong> ${weatherCodeToDescription_ua(weather_code[index])}</p>
 						<p><strong>Макс. температура:</strong> ${temperature_2m_max[index]}°C</p>
