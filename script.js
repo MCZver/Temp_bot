@@ -5,6 +5,14 @@ const formatDate = (date) => {
     const year = date.getFullYear();
     return `${day}.${month}.${year}`;
 };
+const formatDateTime = (date) => {
+    const day = String(date.getDate()).padStart(2, '0');
+    const month = String(date.getMonth() + 1).padStart(2, '0'); // Месяцы начинаются с 0
+    const year = date.getFullYear();
+	const hour = date.getHours();
+	const minute = date.getMinutes();
+    return `${hour}:${minute}`;
+};
 
 // Форматирование даты в ISO строку yyyy-mm-dd
 const formatDateToResponse = (date) => date.toISOString().split('T')[0];
@@ -79,7 +87,7 @@ const weatherCodeToDescription_ua = (code) => {
 
 // Функция для расчета среднего значения влажности для каждого дня
 const calculateDailyAverageHumidity = (hourlyHumidity, hourlyTimes, date) => {
-    const dateStart = new Date(date);
+	const dateStart = new Date(date);
     const dateEnd = new Date(date);
     dateEnd.setDate(dateStart.getDate() + 1);
 
@@ -104,16 +112,16 @@ function showWeather(index) {
 // Инициализация данных при загрузке страницы
 window.addEventListener('DOMContentLoaded', async () => {
     try {
-	let buttonLabels = [];
-	window.Telegram.WebApp.ready();
-        window.Telegram.WebApp.expand();
-        // Получение языка пользователя
-        const userLanguage = window.Telegram.WebApp.initDataUnsafe.user.language_code || 'ru';
-	//const userLanguage = 'ru';
-	// Определяем переменную colorScheme
-	const colorScheme = window.Telegram.WebApp.colorScheme;
-	//const colorScheme = 'dark'; // Значение может быть 'white' или 'dark'
-	console.log(window.Telegram.WebApp);
+		let buttonLabels = [];
+		window.Telegram.WebApp.ready();
+		window.Telegram.WebApp.expand();
+		// Получение языка пользователя
+		const userLanguage = window.Telegram.WebApp.initDataUnsafe.user.language_code || 'ru';
+		//const userLanguage = 'uk';
+		// Определяем переменную colorScheme
+		const colorScheme = window.Telegram.WebApp.colorScheme;
+		//const colorScheme = 'dark'; // Значение может быть 'white' или 'dark'
+		console.log(window.Telegram.WebApp);
 		
         // Получение текущей даты и даты через два дня
         const today = new Date();
@@ -146,7 +154,10 @@ window.addEventListener('DOMContentLoaded', async () => {
             apparent_temperature_max,
             apparent_temperature_min,
             precipitation_probability_max,
-            wind_speed_10m_max
+            wind_speed_10m_max,
+			sunrise,
+			sunset,
+			daylight_duration
         } = dailyData;
 
         // Получение данных о влажности
@@ -165,7 +176,6 @@ window.addEventListener('DOMContentLoaded', async () => {
 				titleContainer.insertAdjacentHTML('beforeend', 'Прогноз погоди');
 				buttonLabels = ['Сьогодні', 'Завтра', 'Післязавтра'];
 			}
-
         time.forEach((date, index) => {
             const button = document.createElement('button');
             button.innerText = buttonLabels[index];
@@ -184,6 +194,9 @@ window.addEventListener('DOMContentLoaded', async () => {
 						<p><strong>Вероятность осадков:</strong> ${precipitation_probability_max[index]}%</p>
 						<p><strong>Макс. скорость ветра:</strong> ${wind_speed_10m_max[index]} км/ч</p>
 						<p><strong>Средняя влажность:</strong> ${calculateDailyAverageHumidity(hourlyHumidity, hourlyTimes, date)}%</p>
+						<p><strong>Восход:</strong> ${formatDateTime(new Date(sunrise[index]))}</p>
+						<p><strong>Заката:</strong> ${formatDateTime(new Date(sunset[index]))}</p>
+						<p><strong>Продолжительность дня:</strong> ${Math.round(daylight_duration[index] / 3600)} ч</p>
 					</div>
                 </div>
             `;
@@ -191,16 +204,19 @@ window.addEventListener('DOMContentLoaded', async () => {
 			const weatherHtml_ua = `
                 <div id="date-${index}" class="weather-info" style="display: none;">
                     <h2 class="date-heading">${formatDate(new Date(date))} (${buttonLabels[index]})</h2>
-					<div class="weather-details">
-						<p><strong>Опис погоди:</strong> ${weatherCodeToDescription_ua(weather_code[index])}</p>
-						<p><strong>Макс. температура:</strong> ${temperature_2m_max[index]}°C</p>
-						<p><strong>Мін. температура:</strong> ${temperature_2m_min[index]}°C</p>
-						<p><strong>Макс. температура по відчуттям:</strong> ${apparent_temperature_max[index]}°C</p>
-						<p><strong>Мін. температура по відчуттям:</strong> ${apparent_temperature_min[index]}°C</p>
-						<p><strong>Можливість опадів:</strong> ${precipitation_probability_max[index]}%</p>
-						<p><strong>Макс. швидкість вітру:</strong> ${wind_speed_10m_max[index]} км/ч</p>
-						<p><strong>Середня вологість:</strong> ${calculateDailyAverageHumidity(hourlyHumidity, hourlyTimes, date)}%</p>
-					</div>
+			<div class="weather-details">
+				<p><strong>Опис погоди:</strong> ${weatherCodeToDescription_ua(weather_code[index])}</p>
+				<p><strong>Макс. температура:</strong> ${temperature_2m_max[index]}°C</p>
+				<p><strong>Мін. температура:</strong> ${temperature_2m_min[index]}°C</p>
+				<p><strong>Макс. температура по відчуттям:</strong> ${apparent_temperature_max[index]}°C</p>
+				<p><strong>Мін. температура по відчуттям:</strong> ${apparent_temperature_min[index]}°C</p>
+				<p><strong>Можливість опадів:</strong> ${precipitation_probability_max[index]}%</p>
+				<p><strong>Макс. швидкість вітру:</strong> ${wind_speed_10m_max[index]} км/ч</p>
+				<p><strong>Середня вологість:</strong> ${calculateDailyAverageHumidity(hourlyHumidity, hourlyTimes, date)}%</p>
+				<p><strong>Схід сонця:</strong> ${formatDateTime(new Date(sunrise[index]))}</p>
+				<p><strong>Захід сонця:</strong> ${formatDateTime(new Date(sunset[index]))}</p>
+				<p><strong>Тривалість дня:</strong> ${Math.round(daylight_duration[index] / 3600)} ч</p>
+			</div>
                 </div>
             `;
 			
