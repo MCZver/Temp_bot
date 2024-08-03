@@ -106,11 +106,14 @@ function showWeather(index) {
 window.addEventListener('DOMContentLoaded', async () => {
     try {
 	window.Telegram.WebApp.ready();
-    window.Telegram.WebApp.expand();
-    // Получение языка пользователя
-    const userLanguage = window.Telegram.WebApp.initDataUnsafe.user.language_code || 'ru';
-    //const userLanguage = 'ru';
-    //console.log(window.Telegram.WebApp);
+        window.Telegram.WebApp.expand();
+        // Получение языка пользователя
+        const userLanguage = window.Telegram.WebApp.initDataUnsafe.user.language_code || 'ru';
+	//const userLanguage = 'ru';
+	// Определяем переменную colorScheme
+	const colorScheme = window.Telegram.WebApp.colorScheme;
+	//const colorScheme = 'dark'; // Значение может быть 'white' или 'dark'
+	console.log(window.Telegram.WebApp);
 		
         // Получение текущей даты и даты через два дня
         const today = new Date();
@@ -153,13 +156,13 @@ window.addEventListener('DOMContentLoaded', async () => {
         // Формирование HTML с кнопками и данными о погоде
         const buttonsContainer = document.getElementById('buttons');
         const weatherDataContainer = document.getElementById('weather-data');
-	const titleContainer = document.getElementById('title');
-	if(userLanguage === "ru") {
-			titleContainer.insertAdjacentHTML('beforeend', 'Прогноз погоды');
-	}
-	if(userLanguage === "uk") {
-		titleContainer.insertAdjacentHTML('beforeend', 'Прогноз погоди');
-	}
+		const titleContainer = document.getElementById('title');
+		if(userLanguage === "ru") {
+				titleContainer.insertAdjacentHTML('beforeend', 'Прогноз погоды');
+			}
+			if(userLanguage === "uk") {
+				titleContainer.insertAdjacentHTML('beforeend', 'Прогноз погоди');
+			}
 
         time.forEach((date, index) => {
             const button = document.createElement('button');
@@ -184,7 +187,7 @@ window.addEventListener('DOMContentLoaded', async () => {
 			const weatherHtml_ua = `
                 <div id="date-${index}" class="weather-info" style="display: none;">
                     <h2>${formatDate(new Date(date))}</h2>
-                    <p><strong>Описание погоды:</strong> ${weatherCodeToDescription_ua(weather_code[index])}</p>
+                    <p><strong>Опис погоди:</strong> ${weatherCodeToDescription_ua(weather_code[index])}</p>
                     <p><strong>Макс. температура:</strong> ${temperature_2m_max[index]}°C</p>
                     <p><strong>Мін. температура:</strong> ${temperature_2m_min[index]}°C</p>
                     <p><strong>Макс. температура по відчуттям:</strong> ${apparent_temperature_max[index]}°C</p>
@@ -195,12 +198,18 @@ window.addEventListener('DOMContentLoaded', async () => {
                 </div>
             `;
 			
-		if(userLanguage === "ru") {
-			weatherDataContainer.insertAdjacentHTML('beforeend', weatherHtml_ru);
-		}
-		if(userLanguage === "uk") {
-			weatherDataContainer.insertAdjacentHTML('beforeend', weatherHtml_ua);
-		}
+			if(userLanguage === "ru") {
+				weatherDataContainer.insertAdjacentHTML('beforeend', weatherHtml_ru);
+			}
+			if(userLanguage === "uk") {
+				weatherDataContainer.insertAdjacentHTML('beforeend', weatherHtml_ua);
+			}
+			
+			if (colorScheme === 'white') {
+				document.body.classList.add('light-theme');
+			} else if (colorScheme === 'dark') {
+				document.body.classList.add('dark-theme');
+			}
             
         });
 
