@@ -215,7 +215,7 @@ window.addEventListener('DOMContentLoaded', async () => {
 				<p><strong>Середня вологість:</strong> ${calculateDailyAverageHumidity(hourlyHumidity, hourlyTimes, date)}%</p>
 				<p><strong>Схід сонця:</strong> ${formatDateTime(new Date(sunrise[index]))}</p>
 				<p><strong>Захід сонця:</strong> ${formatDateTime(new Date(sunset[index]))}</p>
-				<p><strong>Тривалість дня:</strong> ${Math.round(daylight_duration[index] / 3600)} ч</p>
+				<p><strong>Тривалість дня:</strong> ${Math.round(daylight_duration[index] / 3600)} г</p>
 			</div>
                 </div>
             `;
