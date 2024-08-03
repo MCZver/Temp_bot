@@ -12,68 +12,67 @@ const formatDateToResponse = (date) => date.toISOString().split('T')[0];
 // Пример функции для преобразования кодов погоды в описания
 const weatherCodeToDescription_ru = (code) => {
     switch (code) {
-        case 0: return "Ясно";
-        case 1: return "Малоблачно";
-        case 2: return "Облачно";
-        case 3: return "Переменная облачность";
-        case 45: return "Туман";
-        case 48: return "Заморозки тумана";
-        case 51: return "Легкий дождь";
-        case 53: return "Умеренный дождь";
-        case 55: return "Сильный дождь";
-        case 56: return "Легкий дождь с льдом";
-        case 57: return "Сильный дождь с льдом";
-        case 61: return "Легкий дождь с осадками";
-        case 63: return "Умеренный дождь с осадками";
-        case 65: return "Сильный дождь с осадками";
-        case 66: return "Легкий дождь с льдом и осадками";
-        case 67: return "Сильный дождь с льдом и осадками";
-        case 71: return "Легкий снег";
-        case 73: return "Умеренный снег";
-        case 75: return "Сильный снег";
-        case 77: return "Легкие снежинки";
-        case 80: return "Легкий дождь и осадки";
-        case 81: return "Умеренный дождь и осадки";
-        case 82: return "Сильный дождь и осадки";
-        case 85: return "Легкий снегопад";
-        case 86: return "Сильный снегопад";
-        case 95: return "Гроза";
-        case 96: return "Гроза с легким дождем";
-        case 99: return "Гроза с сильным дождем";
-        default: return "Неизвестно";
+        case 0: return "Чистое небо"
+		case 1: return "Предпочтительно ясно"
+		case 2: return "Облачно"
+		case 3: return "Переменная облачность"
+		case 45: return "Туман"
+		case 48: return "Иний"
+		case 51: return "Слабая морось"
+		case 53: return "Мряка"
+		case 55: return "Густой туман"
+		case 56: return "Легкий ледяной дождь"
+		case 57: return "Сильный ледяной дождь"
+		case 61: return "Слабый дождь"
+		case 63: return "Дождь"
+		case 65: return "Сильный дождь"
+		case 66: return "Слабый град"
+		case 67: return "Сильный град"
+		case 71: return "Слабый снегопад"
+		case 73: return "Снегопад"
+		case 75: return "Сильный снегопад"
+		case 77: return "Снежные крупинки"
+		case 80: return "Небольшой ливень"
+		case 81: return "Ливень"
+		case 82: return "Сильный ливень"
+		case 85: return "Небольшая метель"
+		case 86: return "Сильная метель"
+		case 95: return "Гроза"
+		case 96: return "Гроза с градом"
+		case 99: return "Гроза с сильным градом"
     }
 };
 
 const weatherCodeToDescription_ua = (code) => {
     switch (code) {
-        case 0: return "Ясно";
-        case 1: return "Малохмарно";
-        case 2: return "Хмарно";
-        case 3: return "Змінна хмарність";
-        case 45: return "Туман";
-        case 48: return "Заморозки туману";
-        case 51: return "Легкий дощ";
-        case 53: return "Помірний дощ";
-        case 55: return "Можливий дощ";
-        case 56: return "Легкий дощ із льодом";
-        case 57: return "Можливий дощ з льодом";
-        case 61: return "Легкий дощ з опадами";
-        case 63: return "Помірний дощ з опадами";
-        case 65: return "Можливий дощ з опадами";
-        case 66: return "Легкий дощ із льодом та опадами";
-        case 67: return "Сильний дощ із льодом та опадами";
-        case 71: return "Легкий сніг";
-        case 73: return "Помірний сніг";
-        case 75: return "Сильний сніг";
-        case 77: return "Легкі сніжинки";
-        case 80: return "Легкий дощ та опади";
-        case 81: return "Помірний дощ та опади";
-        case 82: return "Можливий дощ та опади";
-        case 85: return "Легкий снігопад";
-        case 86: return "Сильний снігопад";
-        case 95: return "Гроза";
-        case 96: return "Гроза з легким дощем";
-        case 99: return "Гроза із сильним дощем";
+        case 0: return "Чисте небо"
+		case 1: return "Переважно ясно"
+		case 2: return "Мінлива хмарність"
+		case 3: return "Похмуро"
+		case 45: return "Туман"
+		case 48: return "Іній"
+		case 51: return "Слабка мряка"
+		case 53: return "Мряка"
+		case 55: return "Густа мряка"
+		case 56: return "Легкий крижаний дощ"
+		case 57: return "Сильний крижаний дощ"
+		case 61: return "Слабкий дощ"
+		case 63: return "Дощ"
+		case 65: return "Сильний дощ"
+		case 66: return "Слабкий град"
+		case 67: return "Сильний град"
+		case 71: return "Слабкий снігопад"
+		case 73: return "Снігопад"
+		case 75: return "Сильний снігопад"
+		case 77: return "Снігові крупинки"
+		case 80: return "Невелика злива"
+		case 81: return "Злива"
+		case 82: return "Сильна злива"
+		case 85: return "Невелика завірюха"
+		case 86: return "Сильна завірюха"
+		case 95: return "Гроза"
+		case 96: return "Гроза з градом"
+		case 99: return "Гроза з сильним градом"
         default: return "Невідомо";
     }
 };
@@ -105,15 +104,15 @@ function showWeather(index) {
 // Инициализация данных при загрузке страницы
 window.addEventListener('DOMContentLoaded', async () => {
     try {
-	window.Telegram.WebApp.ready();
-        window.Telegram.WebApp.expand();
-        // Получение языка пользователя
-        const userLanguage = window.Telegram.WebApp.initDataUnsafe.user.language_code || 'ru';
-	//const userLanguage = 'ru';
-	// Определяем переменную colorScheme
-	const colorScheme = window.Telegram.WebApp.colorScheme;
-	//const colorScheme = 'dark'; // Значение может быть 'white' или 'dark'
-	console.log(window.Telegram.WebApp);
+		window.Telegram.WebApp.ready();
+            window.Telegram.WebApp.expand();
+            // Получение языка пользователя
+            //const userLanguage = window.Telegram.WebApp.initDataUnsafe.user.language_code || 'ru';
+			const userLanguage = 'ru';
+			// Определяем переменную colorScheme
+			//const colorScheme = window.Telegram.WebApp.colorScheme;
+			const colorScheme = 'dark'; // Значение может быть 'white' или 'dark'
+			console.log(window.Telegram.WebApp);
 		
         // Получение текущей даты и даты через два дня
         const today = new Date();
@@ -172,29 +171,33 @@ window.addEventListener('DOMContentLoaded', async () => {
 
             const weatherHtml_ru = `
                 <div id="date-${index}" class="weather-info" style="display: none;">
-                    <h2>${formatDate(new Date(date))}</h2>
-                    <p><strong>Описание погоды:</strong> ${weatherCodeToDescription_ru(weather_code[index])}</p>
-                    <p><strong>Макс. температура:</strong> ${temperature_2m_max[index]}°C</p>
-                    <p><strong>Мин. температура:</strong> ${temperature_2m_min[index]}°C</p>
-                    <p><strong>Макс. температура по ощущениям:</strong> ${apparent_temperature_max[index]}°C</p>
-                    <p><strong>Мин. температура по ощущениям:</strong> ${apparent_temperature_min[index]}°C</p>
-                    <p><strong>Вероятность осадков:</strong> ${precipitation_probability_max[index]}%</p>
-                    <p><strong>Макс. скорость ветра:</strong> ${wind_speed_10m_max[index]} км/ч</p>
-                    <p><strong>Средняя влажность:</strong> ${calculateDailyAverageHumidity(hourlyHumidity, hourlyTimes, date)}%</p>
+                    <h2 class="date-heading">${formatDate(new Date(date))}</h2>
+					<div class="weather-details">
+						<p><strong>Описание погоды:</strong> ${weatherCodeToDescription_ru(weather_code[index])}</p>
+						<p><strong>Макс. температура:</strong> ${temperature_2m_max[index]}°C</p>
+						<p><strong>Мин. температура:</strong> ${temperature_2m_min[index]}°C</p>
+						<p><strong>Макс. температура по ощущениям:</strong> ${apparent_temperature_max[index]}°C</p>
+						<p><strong>Мин. температура по ощущениям:</strong> ${apparent_temperature_min[index]}°C</p>
+						<p><strong>Вероятность осадков:</strong> ${precipitation_probability_max[index]}%</p>
+						<p><strong>Макс. скорость ветра:</strong> ${wind_speed_10m_max[index]} км/ч</p>
+						<p><strong>Средняя влажность:</strong> ${calculateDailyAverageHumidity(hourlyHumidity, hourlyTimes, date)}%</p>
+					</div>
                 </div>
             `;
 			
 			const weatherHtml_ua = `
                 <div id="date-${index}" class="weather-info" style="display: none;">
-                    <h2>${formatDate(new Date(date))}</h2>
-                    <p><strong>Опис погоди:</strong> ${weatherCodeToDescription_ua(weather_code[index])}</p>
-                    <p><strong>Макс. температура:</strong> ${temperature_2m_max[index]}°C</p>
-                    <p><strong>Мін. температура:</strong> ${temperature_2m_min[index]}°C</p>
-                    <p><strong>Макс. температура по відчуттям:</strong> ${apparent_temperature_max[index]}°C</p>
-                    <p><strong>Мин. температура по відчуттям:</strong> ${apparent_temperature_min[index]}°C</p>
-                    <p><strong>Можливість опадів:</strong> ${precipitation_probability_max[index]}%</p>
-                    <p><strong>Макс. швидкість вітру:</strong> ${wind_speed_10m_max[index]} км/ч</p>
-                    <p><strong>Середня вологість:</strong> ${calculateDailyAverageHumidity(hourlyHumidity, hourlyTimes, date)}%</p>
+                    <h2 class="date-heading">${formatDate(new Date(date))}</h2>
+					<div class="weather-details">
+						<p><strong>Опис погоди:</strong> ${weatherCodeToDescription_ua(weather_code[index])}</p>
+						<p><strong>Макс. температура:</strong> ${temperature_2m_max[index]}°C</p>
+						<p><strong>Мін. температура:</strong> ${temperature_2m_min[index]}°C</p>
+						<p><strong>Макс. температура по відчуттям:</strong> ${apparent_temperature_max[index]}°C</p>
+						<p><strong>Мин. температура по відчуттям:</strong> ${apparent_temperature_min[index]}°C</p>
+						<p><strong>Можливість опадів:</strong> ${precipitation_probability_max[index]}%</p>
+						<p><strong>Макс. швидкість вітру:</strong> ${wind_speed_10m_max[index]} км/ч</p>
+						<p><strong>Середня вологість:</strong> ${calculateDailyAverageHumidity(hourlyHumidity, hourlyTimes, date)}%</p>
+					</div>
                 </div>
             `;
 			
