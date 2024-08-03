@@ -196,7 +196,7 @@ window.addEventListener('DOMContentLoaded', async () => {
 						<p><strong>Макс. температура:</strong> ${temperature_2m_max[index]}°C</p>
 						<p><strong>Мін. температура:</strong> ${temperature_2m_min[index]}°C</p>
 						<p><strong>Макс. температура по відчуттям:</strong> ${apparent_temperature_max[index]}°C</p>
-						<p><strong>Мин. температура по відчуттям:</strong> ${apparent_temperature_min[index]}°C</p>
+						<p><strong>Мін. температура по відчуттям:</strong> ${apparent_temperature_min[index]}°C</p>
 						<p><strong>Можливість опадів:</strong> ${precipitation_probability_max[index]}%</p>
 						<p><strong>Макс. швидкість вітру:</strong> ${wind_speed_10m_max[index]} км/ч</p>
 						<p><strong>Середня вологість:</strong> ${calculateDailyAverageHumidity(hourlyHumidity, hourlyTimes, date)}%</p>
