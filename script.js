@@ -190,7 +190,7 @@ window.addEventListener('DOMContentLoaded', async () => {
 			if(userLanguage === ru) {
 				weatherDataContainer.insertAdjacentHTML('beforeend', weatherHtml_ru);
 			}
-			if(userLanguage === ua) {
+			if(userLanguage === uk) {
 				weatherDataContainer.insertAdjacentHTML('beforeend', weatherHtml_ua);
 			}
             
