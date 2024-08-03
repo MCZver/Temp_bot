@@ -3,12 +3,16 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <!-- <title>Прогноз погоды</title> -->
     <style>
-        body {
-            background-color: white; /* Устанавливаем цвет фона */
+        body.light-theme {
+            background-color: white; /* Светлый фон */
+            color: black;
             font-family: Arial, sans-serif;
-            padding: 20px;
+        }
+        body.dark-theme {
+            background-color: #121212; /* Темный фон */
+            color: white;
+            font-family: 'Arial', monospace;
         }
         table {
             border-collapse: collapse;
@@ -20,7 +24,10 @@
             text-align: left;
         }
         th {
-            background-color: #f2f2f2;
+            background-color: #f2f2f2; /* Светлый фон заголовков таблицы */
+        }
+        body.dark-theme th {
+            background-color: #333; /* Темный фон заголовков таблицы */
         }
         #buttons {
             margin: 20px 0;
@@ -29,18 +36,33 @@
             margin: 5px;
             padding: 10px;
             font-size: 16px;
+            border: none;
+            cursor: pointer;
+        }
+        .light-theme button {
+            background-color: #f0f0f0; /* Светлый фон кнопок */
+            color: black;
+        }
+        .light-theme button:hover {
+            background-color: #e0e0e0; /* Фон при наведении для светлой темы */
+        }
+        .dark-theme button {
+            background-color: #333; /* Темный фон кнопок */
+            color: white;
+        }
+        .dark-theme button:hover {
+            background-color: #555; /* Фон при наведении для темной темы */
         }
         .weather-info {
             margin-bottom: 20px;
         }
     </style>
-	<script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <script src="script.js"></script>
 </head>
-<body>
+<body class="light-theme">
     <h1 id="title"></h1>
     <div id="buttons"></div>
     <div id="weather-data"></div>
-		
 </body>
 </html>
