@@ -31,6 +31,7 @@
         }
         #buttons {
             margin: 20px 0;
+			text-align: center; /* Центрируем заголовок по горизонтали */
         }
         button {
             margin: 5px;
@@ -56,12 +57,22 @@
         .weather-info {
             margin-bottom: 20px;
         }
+		.date-heading {
+		  text-align: center; /* Центрируем заголовок по горизонтали */
+		  margin: 20px 0;
+		}
+
+		.weather-details {
+		  max-width: 600px; /* Максимальная ширина блока */
+		  margin: 0 auto; /* Центрируем блок по горизонтали */
+		  text-align: left; /* Текст внутри блока выравниваем по левому краю */
+		}
     </style>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <script src="script.js"></script>
 </head>
-<body class="light-theme">
-    <h1 id="title"></h1>
+<body class="light-theme"> <!-- Начальное значение класса темы -->
+    <center><h1 id="title"></h1></center>
     <div id="buttons"></div>
     <div id="weather-data"></div>
 </body>
