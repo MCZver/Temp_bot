@@ -73,6 +73,10 @@ const handler = async (req: Request): Promise<Response> => {
   </style>
   <meta charset="UTF-8">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns@2.0.0"></script> <!-- Подключение адаптера для даты -->
+  <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-zoom@1.0.0"></script>
+  <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
 </head>
 <body>
   <div class="container">
@@ -93,9 +97,6 @@ const handler = async (req: Request): Promise<Response> => {
     </div>
   </div>
 
-  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-zoom"></script>
-  <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
   <script>
     let chart = null;
 
