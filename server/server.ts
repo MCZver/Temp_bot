@@ -1,40 +1,4 @@
-import { serve } from "https://deno.land/std@0.140.0/http/server.ts";
-
-const handler = async (req: Request): Promise<Response> => {
-  const url = new URL(req.url);
-
-  if (req.method === "POST" && url.pathname === "/data") {
-    try {
-      const kv = await Deno.openKv();
-      const body = await req.json();
-      const timestamp = Date.now();
-      const street_temp = body.street_temp;
-      const home_temp = body.home_temp;
-      const KVdata = {
-        timestamp: timestamp,
-        street_temp: street_temp,
-        home_temp: home_temp,
-      };
-
-      if (typeof street_temp !== 'number' || typeof home_temp !== 'number') {
-        return new Response("Invalid data format", { status: 400 });
-      }
-
-      await kv.set(["TempData", timestamp], KVdata);
-      return new Response(JSON.stringify(KVdata), { status: 200 });
-
-    } catch (err) {
-      return new Response("Invalid JSON format", { status: 400 });
-    }
-
-  } else if (req.method === "GET" && url.pathname === "/data") {
-    const kvData = await exportKvToJSON();
-    return new Response(JSON.stringify(kvData), { status: 200 });
-
-  } else if (req.method === "GET" && url.pathname === "/") {
-    return new Response(
-      `
-      <!DOCTYPE html>
+<!DOCTYPE html>
 <html>
 <head>
   <style>
@@ -78,14 +42,14 @@ const handler = async (req: Request): Promise<Response> => {
   <div class="container">
     <div class="button-group">
       <button id="exportDataBtn">Экспорт данных</button>
-      <button id="last1HourBtn">Последний час</button>
-      <button id="last3HoursBtn">Последние 3 часа</button>
-      <button id="last12HoursBtn">Последние 12 часов</button>
-      <button id="last24HoursBtn">Сутки</button>
-      <button id="last3DaysBtn">Три дня</button>
-      <button id="last7DaysBtn">Неделя</button>
+      <button id="last1HourBtn" disabled>Последний час</button>
+      <button id="last3HoursBtn" disabled>Последние 3 часа</button>
+      <button id="last12HoursBtn" disabled>Последние 12 часов</button>
+      <button id="last24HoursBtn" disabled>Сутки</button>
+      <button id="last3DaysBtn" disabled>Три дня</button>
+      <button id="last7DaysBtn" disabled>Неделя</button>
       <input type="text" id="datepicker" placeholder="Выберите дату">
-      <button id="selectDayBtn">Выбрать день</button>
+      <button id="selectDayBtn" disabled>Выбрать день</button>
     </div>
     <div id="loading">Загрузка данных...</div>
     <div id="chart-container">
@@ -109,7 +73,7 @@ const handler = async (req: Request): Promise<Response> => {
       window.chartData = Array.isArray(data) ? data : [];  // Убедиться, что данные - это массив
 
       document.getElementById('loading').style.display = 'none';
-      updateButtonsState();
+      updateButtonsState(true);  // Активировать кнопки
     });
 
     document.getElementById('last1HourBtn').addEventListener('click', () => updateChart(1));
@@ -118,7 +82,7 @@ const handler = async (req: Request): Promise<Response> => {
     document.getElementById('last24HoursBtn').addEventListener('click', () => updateChart(24));
     document.getElementById('last3DaysBtn').addEventListener('click', () => updateChart(72));
     document.getElementById('last7DaysBtn').addEventListener('click', () => updateChart(168));
-    
+
     flatpickr("#datepicker", {
       dateFormat: "Y-m-d",
       onChange: function(selectedDates) {
@@ -128,14 +92,9 @@ const handler = async (req: Request): Promise<Response> => {
       }
     });
 
-    function updateButtonsState() {
-      const hasData = Array.isArray(window.chartData) && window.chartData.length > 0;
-      document.getElementById('last1HourBtn').disabled = !hasData;
-      document.getElementById('last3HoursBtn').disabled = !hasData;
-      document.getElementById('last12HoursBtn').disabled = !hasData;
-      document.getElementById('last24HoursBtn').disabled = !hasData;
-      document.getElementById('last3DaysBtn').disabled = !hasData;
-      document.getElementById('last7DaysBtn').disabled = !hasData;
+    function updateButtonsState(hasData) {
+      const buttons = document.querySelectorAll('.button-group button');
+      buttons.forEach(button => button.disabled = !hasData);
     }
 
     function updateChart(hours) {
@@ -302,25 +261,3 @@ const handler = async (req: Request): Promise<Response> => {
   </script>
 </body>
 </html>
-      `,
-      { status: 200, headers: { "Content-Type": "text/html" } }
-    );
-  }
-
-  return new Response("Not Found", { status: 404 });
-};
-
-// Функция для экспорта всех данных KV
-async function exportKvToJSON() {
-  const kv = await Deno.openKv();
-  const kvData: Record<string, unknown> = {};
-
-  for await (const entry of kv.list({ prefix: ["TempData"] })) {
-    const keyString = entry.key.join(":");
-    kvData[keyString] = entry.value;
-  }
-
-  return kvData;
-}
-
-serve(handler);
