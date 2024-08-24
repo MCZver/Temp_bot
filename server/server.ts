@@ -58,6 +58,18 @@ const handler = async (req: Request): Promise<Response> => {
       100% { transform: rotate(360deg); }
     }
     .hidden { display: none; }
+    .buttons {
+      position: absolute;
+      top: 10px;
+      left: 10px;
+      background-color: white;
+      padding: 10px;
+      border-radius: 5px;
+      box-shadow: 0px 0px 5px rgba(0, 0, 0, 0.2);
+    }
+    .date-picker {
+      display: none;
+    }
   </style>
   <!-- Подключаем Chart.js -->
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
@@ -68,14 +80,25 @@ const handler = async (req: Request): Promise<Response> => {
 </head>
 <body>
   <div class="container">
-    <button id="exportBtn">Export Data</button>
+    <div class="buttons">
+      <button id="exportBtn">Export Data</button>
+      <button id="hourBtn" class="hidden">Last Hour</button>
+      <button id="threeHoursBtn" class="hidden">Last 3 Hours</button>
+      <button id="dayBtn" class="hidden">Select Day</button>
+      <input id="datePicker" type="date" class="date-picker" />
+    </div>
     <div id="spinner" class="spinner hidden"></div>
     <canvas id="chart"></canvas>
   </div>
   <script>
     const exportBtn = document.getElementById("exportBtn");
+    const hourBtn = document.getElementById("hourBtn");
+    const threeHoursBtn = document.getElementById("threeHoursBtn");
+    const dayBtn = document.getElementById("dayBtn");
+    const datePicker = document.getElementById("datePicker");
     const canvas = document.getElementById('chart');
     const spinner = document.getElementById('spinner');
+    let chart = null;
 
     exportBtn.addEventListener('click', async () => {
       spinner.classList.remove('hidden'); // Показать спиннер
@@ -85,7 +108,7 @@ const handler = async (req: Request): Promise<Response> => {
         if (response.ok) {
           const jsonData = await response.json();
           console.log("Exported KV Data:", jsonData);
-          createChart(jsonData);
+          showPeriodButtons();
         } else {
           alert("Failed to export data");
         }
@@ -95,6 +118,64 @@ const handler = async (req: Request): Promise<Response> => {
         spinner.classList.add('hidden'); // Скрыть спиннер после завершения
       }
     });
+
+    function showPeriodButtons() {
+      hourBtn.classList.remove('hidden');
+      threeHoursBtn.classList.remove('hidden');
+      dayBtn.classList.remove('hidden');
+    }
+
+    hourBtn.addEventListener('click', () => plotData('hour'));
+    threeHoursBtn.addEventListener('click', () => plotData('threeHours'));
+    dayBtn.addEventListener('click', () => {
+      datePicker.classList.remove('hidden');
+      datePicker.addEventListener('change', () => plotData('day', datePicker.value));
+    });
+
+    function plotData(period, date) {
+      if (chart) {
+        chart.destroy(); // Удаляем предыдущий график, если он существует
+      }
+
+      spinner.classList.remove('hidden'); // Показать спиннер
+
+      fetch("/data")
+        .then(response => response.json())
+        .then(jsonData => {
+          const filteredData = filterData(jsonData, period, date);
+          createChart(filteredData);
+        })
+        .catch(error => {
+          alert("An error occurred while fetching data");
+        })
+        .finally(() => {
+          spinner.classList.add('hidden'); // Скрыть спиннер после завершения
+        });
+    }
+
+    function filterData(data, period, date) {
+      const now = new Date();
+      const filteredData = {};
+      Object.keys(data).forEach(key => {
+        const entry = data[key];
+        const entryDate = new Date(entry.timestamp);
+
+        let include = false;
+        if (period === 'hour') {
+          include = (now - entryDate) < 3600000; // Last hour
+        } else if (period === 'threeHours') {
+          include = (now - entryDate) < 10800000; // Last 3 hours
+        } else if (period === 'day' && date) {
+          const selectedDate = new Date(date);
+          include = entryDate.toDateString() === selectedDate.toDateString();
+        }
+
+        if (include) {
+          filteredData[key] = entry;
+        }
+      });
+      return filteredData;
+    }
 
     function createChart(data) {
       const timestamps = [];
@@ -109,7 +190,7 @@ const handler = async (req: Request): Promise<Response> => {
       });
 
       const ctx = canvas.getContext('2d');
-      new Chart(ctx, {
+      chart = new Chart(ctx, {
         type: 'line',
         data: {
           labels: timestamps,
