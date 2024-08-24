@@ -35,111 +35,113 @@ const handler = async (req: Request): Promise<Response> => {
     return new Response(
       `
       <!DOCTYPE html>
-      <html>
-      <head>
-        <style>
-          body { font-family: Arial, sans-serif; }
-          .container { max-width: 800px; margin: auto; padding: 20px; }
-          canvas { background: #f5f5f5; border: 1px solid #ddd; }
-        </style>
-        <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-        <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-zoom"></script>
-      </head>
-      <body>
-        <div class="container">
-          <h1>Temperature Data</h1>
-          <button id="exportBtn">Export Data</button>
-          <canvas id="chart" style="display:none;"></canvas>
-        </div>
-        <script>
-          const exportBtn = document.getElementById("exportBtn");
-          const canvas = document.getElementById('chart');
+<html>
+<head>
+  <style>
+    body { font-family: Arial, sans-serif; }
+    .container { max-width: 800px; margin: auto; padding: 20px; }
+    canvas { background: #f5f5f5; border: 1px solid #ddd; }
+  </style>
+  <!-- Подключаем Chart.js -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <!-- Подключаем адаптер date-fns для Chart.js -->
+  <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns"></script>
+</head>
+<body>
+  <div class="container">
+    <h1>Temperature Data</h1>
+    <button id="exportBtn">Export Data</button>
+    <canvas id="chart" style="display:none;"></canvas>
+  </div>
+  <script>
+    const exportBtn = document.getElementById("exportBtn");
+    const canvas = document.getElementById('chart');
 
-          exportBtn.addEventListener('click', async () => {
-            const response = await fetch("/data");
-            if (response.ok) {
-              const jsonData = await response.json();
-              console.log("Exported KV Data:", jsonData);
-              createChart(jsonData);
-            } else {
-              alert("Failed to export data");
-            }
-          });
+    exportBtn.addEventListener('click', async () => {
+      const response = await fetch("/data");
+      if (response.ok) {
+        const jsonData = await response.json();
+        console.log("Exported KV Data:", jsonData);
+        createChart(jsonData);
+      } else {
+        alert("Failed to export data");
+      }
+    });
 
-          function createChart(data) {
-            const timestamps = [];
-            const streetTemps = [];
-            const homeTemps = [];
+    function createChart(data) {
+      const timestamps = [];
+      const streetTemps = [];
+      const homeTemps = [];
 
-            Object.keys(data).forEach(key => {
-              const entry = data[key];
-              timestamps.push(new Date(entry.timestamp));
-              streetTemps.push(entry.street_temp);
-              homeTemps.push(entry.home_temp);
-            });
+      Object.keys(data).forEach(key => {
+        const entry = data[key];
+        timestamps.push(new Date(entry.timestamp));
+        streetTemps.push(entry.street_temp);
+        homeTemps.push(entry.home_temp);
+      });
 
-            canvas.style.display = "block"; // Показать canvas после загрузки данных
+      canvas.style.display = "block"; // Показать canvas после загрузки данных
 
-            const ctx = canvas.getContext('2d');
-            const chart = new Chart(ctx, {
-              type: 'line',
-              data: {
-                labels: timestamps,
-                datasets: [
-                  {
-                    label: 'Street Temperature',
-                    borderColor: 'rgb(255, 99, 132)',
-                    data: streetTemps,
-                    fill: false,
-                  },
-                  {
-                    label: 'Home Temperature',
-                    borderColor: 'rgb(54, 162, 235)',
-                    data: homeTemps,
-                    fill: false,
-                  },
-                ],
+      const ctx = canvas.getContext('2d');
+      const chart = new Chart(ctx, {
+        type: 'line',
+        data: {
+          labels: timestamps,
+          datasets: [
+            {
+              label: 'Street Temperature',
+              borderColor: 'rgb(255, 99, 132)',
+              data: streetTemps,
+              fill: false,
+            },
+            {
+              label: 'Home Temperature',
+              borderColor: 'rgb(54, 162, 235)',
+              data: homeTemps,
+              fill: false,
+            },
+          ],
+        },
+        options: {
+          responsive: true,
+          plugins: {
+            zoom: {
+              pan: {
+                enabled: true,
+                mode: 'x',
               },
-              options: {
-                responsive: true,
-                plugins: {
-                  zoom: {
-                    pan: {
-                      enabled: true,
-                      mode: 'x',
-                    },
-                    zoom: {
-                      wheel: {
-                        enabled: true,
-                      },
-                      mode: 'x',
-                    },
-                  },
+              zoom: {
+                wheel: {
+                  enabled: true,
                 },
-                scales: {
-                  x: {
-                    type: 'time',
-                    time: {
-                      unit: 'minute',
-                    },
-                    title: {
-                      display: true,
-                      text: 'Time',
-                    },
-                  },
-                  y: {
-                    title: {
-                      display: true,
-                      text: 'Temperature (°C)',
-                    },
-                  },
-                },
+                mode: 'x',
               },
-            });
-          }
-        </script>
-      </body>
-      </html>
+            },
+          },
+          scales: {
+            x: {
+              type: 'time',
+              time: {
+                unit: 'minute',
+              },
+              title: {
+                display: true,
+                text: 'Time',
+              },
+            },
+            y: {
+              title: {
+                display: true,
+                text: 'Temperature (°C)',
+              },
+            },
+          },
+        },
+      });
+    }
+  </script>
+</body>
+</html>
       `,
       { status: 200, headers: { "Content-Type": "text/html" } }
     );
