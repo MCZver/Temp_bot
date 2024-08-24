@@ -34,7 +34,7 @@ const handler = async (req: Request): Promise<Response> => {
   } else if (req.method === "GET" && url.pathname === "/") {
     return new Response(
       `
-     <!DOCTYPE html>
+    <!DOCTYPE html>
 <html>
 <head>
   <style>
@@ -71,19 +71,14 @@ const handler = async (req: Request): Promise<Response> => {
       color: #333;
     }
   </style>
-  <meta charset="UTF-8">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
-  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-moment"></script>
-  <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-zoom@1.0.0"></script>
-  <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
 </head>
 <body>
   <div class="container">
     <div class="button-group">
       <button id="exportDataBtn">Экспорт данных</button>
       <button id="last1HourBtn" disabled>Последний час</button>
-      <button id="last3HoursBtn" disabled>Последние 3 часа</button>
+      <button id="last3HoursBtn" disabled>Последние три часа</button>
       <button id="last12HoursBtn" disabled>Последние 12 часов</button>
       <button id="last24HoursBtn" disabled>Сутки</button>
       <button id="last3DaysBtn" disabled>Три дня</button>
@@ -96,6 +91,10 @@ const handler = async (req: Request): Promise<Response> => {
     </div>
   </div>
 
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-zoom"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-moment"></script>
+  <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
   <script>
     let chart = null;
 
@@ -103,13 +102,13 @@ const handler = async (req: Request): Promise<Response> => {
       document.getElementById('loading').style.display = 'block';
       const response = await fetch('/data');
       const data = await response.json();
-      console.log('Полученные данные:', data);  // Вывод данных в консоль
+      console.log('Полученные данные:', data);
 
       // Глобальная переменная для хранения данных
-      window.chartData = Array.isArray(data) ? data : [];  // Убедиться, что данные - это массив
-
+      window.chartData = Array.isArray(data) ? data : [];
+      
       document.getElementById('loading').style.display = 'none';
-      updateButtonsState(true);  // Активировать кнопки
+      updateButtonsState(true);
     });
 
     document.getElementById('last1HourBtn').addEventListener('click', () => updateChart(1));
@@ -118,7 +117,7 @@ const handler = async (req: Request): Promise<Response> => {
     document.getElementById('last24HoursBtn').addEventListener('click', () => updateChart(24));
     document.getElementById('last3DaysBtn').addEventListener('click', () => updateChart(72));
     document.getElementById('last7DaysBtn').addEventListener('click', () => updateChart(168));
-
+    
     flatpickr("#datepicker", {
       dateFormat: "Y-m-d",
       onChange: function(selectedDates) {
@@ -129,15 +128,19 @@ const handler = async (req: Request): Promise<Response> => {
     });
 
     function updateButtonsState(hasData) {
-      const buttons = document.querySelectorAll('.button-group button');
-      buttons.forEach(button => button.disabled = !hasData);
+      document.getElementById('last1HourBtn').disabled = !hasData;
+      document.getElementById('last3HoursBtn').disabled = !hasData;
+      document.getElementById('last12HoursBtn').disabled = !hasData;
+      document.getElementById('last24HoursBtn').disabled = !hasData;
+      document.getElementById('last3DaysBtn').disabled = !hasData;
+      document.getElementById('last7DaysBtn').disabled = !hasData;
     }
 
-    function updateChart(hours) {
+    function updateChart(period) {
       if (!Array.isArray(window.chartData)) return;
       const end = new Date();
       const start = new Date();
-      start.setHours(start.getHours() - hours);
+      start.setHours(start.getHours() - period);
 
       const filteredData = window.chartData.filter(item => {
         const itemDate = new Date(item.timestamp);
