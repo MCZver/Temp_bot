@@ -67,8 +67,13 @@ const handler = async (req: Request): Promise<Response> => {
       border-radius: 5px;
       box-shadow: 0px 0px 5px rgba(0, 0, 0, 0.2);
     }
-    .date-picker {
+    .date-picker-container {
       display: none;
+      margin-top: 10px;
+    }
+    #calendar {
+      display: inline-block;
+      margin-left: 10px;
     }
   </style>
   <!-- Подключаем Chart.js -->
@@ -77,6 +82,9 @@ const handler = async (req: Request): Promise<Response> => {
   <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns"></script>
   <!-- Подключаем плагин для масштабирования -->
   <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-zoom@1.0.1/dist/chartjs-plugin-zoom.min.js"></script>
+  <!-- Подключаем flatpickr для календаря -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+  <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
 </head>
 <body>
   <div class="container">
@@ -85,7 +93,9 @@ const handler = async (req: Request): Promise<Response> => {
       <button id="hourBtn" class="hidden">Last Hour</button>
       <button id="threeHoursBtn" class="hidden">Last 3 Hours</button>
       <button id="dayBtn" class="hidden">Select Day</button>
-      <input id="datePicker" type="date" class="date-picker" />
+      <div id="date-picker-container" class="date-picker-container">
+        <input id="calendar" type="text" placeholder="Select date" />
+      </div>
     </div>
     <div id="spinner" class="spinner hidden"></div>
     <canvas id="chart"></canvas>
@@ -95,10 +105,17 @@ const handler = async (req: Request): Promise<Response> => {
     const hourBtn = document.getElementById("hourBtn");
     const threeHoursBtn = document.getElementById("threeHoursBtn");
     const dayBtn = document.getElementById("dayBtn");
-    const datePicker = document.getElementById("datePicker");
-    const canvas = document.getElementById('chart');
+    const calendar = document.getElementById("calendar");
     const spinner = document.getElementById('spinner');
+    const canvas = document.getElementById('chart');
     let chart = null;
+
+    // Инициализация календаря
+    let availableDates = [];
+    flatpickr(calendar, {
+      enable: availableDates,
+      onChange: () => plotData('day', calendar.value),
+    });
 
     exportBtn.addEventListener('click', async () => {
       spinner.classList.remove('hidden'); // Показать спиннер
@@ -108,7 +125,7 @@ const handler = async (req: Request): Promise<Response> => {
         if (response.ok) {
           const jsonData = await response.json();
           console.log("Exported KV Data:", jsonData);
-          showPeriodButtons();
+          showPeriodButtons(jsonData);
         } else {
           alert("Failed to export data");
         }
@@ -119,17 +136,25 @@ const handler = async (req: Request): Promise<Response> => {
       }
     });
 
-    function showPeriodButtons() {
+    function showPeriodButtons(data) {
       hourBtn.classList.remove('hidden');
       threeHoursBtn.classList.remove('hidden');
       dayBtn.classList.remove('hidden');
+      updateAvailableDates(data);
+    }
+
+    function updateAvailableDates(data) {
+      availableDates = Object.values(data).map(entry => {
+        const date = new Date(entry.timestamp);
+        return date.toISOString().split('T')[0]; // Формат yyyy-mm-dd
+      });
+      flatpickr(calendar, { enable: availableDates });
     }
 
     hourBtn.addEventListener('click', () => plotData('hour'));
     threeHoursBtn.addEventListener('click', () => plotData('threeHours'));
     dayBtn.addEventListener('click', () => {
-      datePicker.classList.remove('hidden');
-      datePicker.addEventListener('change', () => plotData('day', datePicker.value));
+      calendar.classList.remove('hidden');
     });
 
     function plotData(period, date) {
