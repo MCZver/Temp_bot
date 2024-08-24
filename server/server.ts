@@ -1,4 +1,40 @@
-<!DOCTYPE html>
+import { serve } from "https://deno.land/std@0.140.0/http/server.ts";
+
+const handler = async (req: Request): Promise<Response> => {
+  const url = new URL(req.url);
+
+  if (req.method === "POST" && url.pathname === "/data") {
+    try {
+      const kv = await Deno.openKv();
+      const body = await req.json();
+      const timestamp = Date.now();
+      const street_temp = body.street_temp;
+      const home_temp = body.home_temp;
+      const KVdata = {
+        timestamp: timestamp,
+        street_temp: street_temp,
+        home_temp: home_temp,
+      };
+
+      if (typeof street_temp !== 'number' || typeof home_temp !== 'number') {
+        return new Response("Invalid data format", { status: 400 });
+      }
+
+      await kv.set(["TempData", timestamp], KVdata);
+      return new Response(JSON.stringify(KVdata), { status: 200 });
+
+    } catch (err) {
+      return new Response("Invalid JSON format", { status: 400 });
+    }
+
+  } else if (req.method === "GET" && url.pathname === "/data") {
+    const kvData = await exportKvToJSON();
+    return new Response(JSON.stringify(kvData), { status: 200 });
+
+  } else if (req.method === "GET" && url.pathname === "/") {
+    return new Response(
+      `
+      <!DOCTYPE html>
 <html>
 <head>
   <style>
@@ -261,3 +297,25 @@
   </script>
 </body>
 </html>
+      `,
+      { status: 200, headers: { "Content-Type": "text/html" } }
+    );
+  }
+
+  return new Response("Not Found", { status: 404 });
+};
+
+// Функция для экспорта всех данных KV
+async function exportKvToJSON() {
+  const kv = await Deno.openKv();
+  const kvData: Record<string, unknown> = {};
+
+  for await (const entry of kv.list({ prefix: ["TempData"] })) {
+    const keyString = entry.key.join(":");
+    kvData[keyString] = entry.value;
+  }
+
+  return kvData;
+}
+
+serve(handler);
