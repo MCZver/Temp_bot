@@ -95,6 +95,7 @@ const handler = async (req: Request): Promise<Response> => {
       <button id="dayBtn" class="hidden">Select Day</button>
       <div id="date-picker-container" class="date-picker-container">
         <input id="calendar" type="text" placeholder="Select date" />
+        <button id="selectDayBtn">Select Day</button>
       </div>
     </div>
     <div id="spinner" class="spinner hidden"></div>
@@ -106,15 +107,16 @@ const handler = async (req: Request): Promise<Response> => {
     const threeHoursBtn = document.getElementById("threeHoursBtn");
     const dayBtn = document.getElementById("dayBtn");
     const calendar = document.getElementById("calendar");
+    const selectDayBtn = document.getElementById("selectDayBtn");
     const spinner = document.getElementById('spinner');
     const canvas = document.getElementById('chart');
     let chart = null;
+    let availableDates = [];
 
     // Инициализация календаря
-    let availableDates = [];
     flatpickr(calendar, {
       enable: availableDates,
-      onChange: () => plotData('day', calendar.value),
+      dateFormat: "Y-m-d",
     });
 
     exportBtn.addEventListener('click', async () => {
@@ -153,9 +155,7 @@ const handler = async (req: Request): Promise<Response> => {
 
     hourBtn.addEventListener('click', () => plotData('hour'));
     threeHoursBtn.addEventListener('click', () => plotData('threeHours'));
-    dayBtn.addEventListener('click', () => {
-      calendar.classList.remove('hidden');
-    });
+    selectDayBtn.addEventListener('click', () => plotData('day', calendar.value));
 
     function plotData(period, date) {
       if (chart) {
