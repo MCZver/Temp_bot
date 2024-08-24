@@ -1,5 +1,4 @@
 import { serve } from "https://deno.land/std@0.140.0/http/server.ts";
-import { openKv } from "https://deno.land/x/kv/mod.ts";
 
 const dataStore = new Map<number, { street_temp: number; home_temp: number }>();
 
@@ -8,7 +7,7 @@ const handler = async (req: Request): Promise<Response> => {
 
   if (req.method === "POST" && url.pathname === "/data") {
     try {
-      const kv = await openKv();
+      const kv = await Deno.openKv();
       const body = await req.json();
       const timestamp = Date.now();
       const street_temp = body.street_temp;
@@ -110,15 +109,14 @@ const handler = async (req: Request): Promise<Response> => {
 
 // Функция для экспорта всех данных KV
 async function exportKvToJSON() {
-  const kv = await openKv();
+  const kv = await Deno.openKv();
   const kvData: Record<string, unknown> = {};
 
-  for await (const entry of kv.list({ prefix: [] })) {
+  for await (const entry of kv.list({ prefix: ["TempData"] })) {
     const keyString = entry.key.join(":");
     kvData[keyString] = entry.value;
   }
 
-  kv.close();
   return kvData;
 }
 
