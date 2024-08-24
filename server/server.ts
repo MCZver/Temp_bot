@@ -38,9 +38,9 @@ const handler = async (req: Request): Promise<Response> => {
 <html>
 <head>
   <style>
-    body { font-family: Arial, sans-serif; }
-    .container { max-width: 800px; margin: auto; padding: 20px; position: relative; }
-    canvas { background: #f5f5f5; border: 1px solid #ddd; }
+    body { font-family: Arial, sans-serif; margin: 0; padding: 0; }
+    .container { position: relative; height: 100vh; width: 100vw; }
+    canvas { width: 100%; height: 100%; }
     .spinner {
       position: absolute;
       top: 50%;
@@ -68,10 +68,9 @@ const handler = async (req: Request): Promise<Response> => {
 </head>
 <body>
   <div class="container">
-    <h1>Temperature Data</h1>
     <button id="exportBtn">Export Data</button>
-    <div id="spinner" class="spinner"></div>
-    <canvas id="chart" class="hidden"></canvas>
+    <div id="spinner" class="spinner hidden"></div>
+    <canvas id="chart"></canvas>
   </div>
   <script>
     const exportBtn = document.getElementById("exportBtn");
@@ -109,7 +108,17 @@ const handler = async (req: Request): Promise<Response> => {
         homeTemps.push(entry.home_temp);
       });
 
-      canvas.style.display = "block"; // Показать canvas после загрузки данных
+      const ctx
+      const timestamps = [];
+      const streetTemps = [];
+      const homeTemps = [];
+
+      Object.keys(data).forEach(key => {
+        const entry = data[key];
+        timestamps.push(new Date(entry.timestamp));
+        streetTemps.push(entry.street_temp);
+        homeTemps.push(entry.home_temp);
+      });
 
       const ctx = canvas.getContext('2d');
       new Chart(ctx, {
@@ -133,6 +142,7 @@ const handler = async (req: Request): Promise<Response> => {
         },
         options: {
           responsive: true,
+          maintainAspectRatio: false, // График будет занимать всю доступную область
           plugins: {
             zoom: {
               pan: {
@@ -156,6 +166,7 @@ const handler = async (req: Request): Promise<Response> => {
               type: 'time',
               time: {
                 unit: 'minute',
+                tooltipFormat: 'll HH:mm',
               },
               title: {
                 display: true,
