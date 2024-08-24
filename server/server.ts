@@ -108,18 +108,6 @@ const handler = async (req: Request): Promise<Response> => {
         homeTemps.push(entry.home_temp);
       });
 
-      const ctx
-      const timestamps = [];
-      const streetTemps = [];
-      const homeTemps = [];
-
-      Object.keys(data).forEach(key => {
-        const entry = data[key];
-        timestamps.push(new Date(entry.timestamp));
-        streetTemps.push(entry.street_temp);
-        homeTemps.push(entry.home_temp);
-      });
-
       const ctx = canvas.getContext('2d');
       new Chart(ctx, {
         type: 'line',
