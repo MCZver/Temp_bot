@@ -71,12 +71,13 @@ const handler = async (req: Request): Promise<Response> => {
       color: #333;
     }
   </style>
+  <meta charset="UTF-8">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
 </head>
 <body>
   <div class="container">
     <div class="button-group">
-      <button id="exportDataBtn">Export Data</button>
+      <button id="exportDataBtn">Экспорт данных</button>
       <button id="last1HourBtn">Последний час</button>
       <button id="last3HoursBtn">Последние 3 часа</button>
       <button id="last12HoursBtn">Последние 12 часов</button>
@@ -84,6 +85,7 @@ const handler = async (req: Request): Promise<Response> => {
       <button id="last3DaysBtn">Три дня</button>
       <button id="last7DaysBtn">Неделя</button>
       <input type="text" id="datepicker" placeholder="Выберите дату">
+      <button id="selectDayBtn">Выбрать день</button>
     </div>
     <div id="loading">Загрузка данных...</div>
     <div id="chart-container">
@@ -300,6 +302,7 @@ const handler = async (req: Request): Promise<Response> => {
   </script>
 </body>
 </html>
+
       `,
       { status: 200, headers: { "Content-Type": "text/html" } }
     );
