@@ -1,7 +1,5 @@
 import { serve } from "https://deno.land/std@0.140.0/http/server.ts";
 
-const dataStore = new Map<number, { street_temp: number; home_temp: number }>();
-
 const handler = async (req: Request): Promise<Response> => {
   const url = new URL(req.url);
 
@@ -22,22 +20,14 @@ const handler = async (req: Request): Promise<Response> => {
         return new Response("Invalid data format", { status: 400 });
       }
 
-      // Сохранение данных в памяти
-      dataStore.set(timestamp, { street_temp, home_temp });
       await kv.set(["TempData", timestamp], KVdata);
-
-      // Вернуть данные
-      return new Response(JSON.stringify({ timestamp, street_temp, home_temp }), { status: 200 });
+      return new Response(JSON.stringify(KVdata), { status: 200 });
 
     } catch (err) {
       return new Response("Invalid JSON format", { status: 400 });
     }
 
   } else if (req.method === "GET" && url.pathname === "/data") {
-    const data = Array.from(dataStore.entries()).map(([timestamp, { street_temp, home_temp }]) => ({ timestamp, street_temp, home_temp }));
-    return new Response(JSON.stringify(data), { status: 200 });
-
-  } else if (req.method === "GET" && url.pathname === "/export") {
     const kvData = await exportKvToJSON();
     return new Response(JSON.stringify(kvData), { status: 200 });
 
@@ -49,53 +39,121 @@ const handler = async (req: Request): Promise<Response> => {
       <head>
         <style>
           body { font-family: Arial, sans-serif; }
-          .container { max-width: 600px; margin: auto; padding: 20px; }
-          .data { white-space: pre-wrap; word-wrap: break-word; }
+          .container { max-width: 800px; margin: auto; padding: 20px; }
+          canvas { background: #f5f5f5; border: 1px solid #ddd; }
         </style>
+        <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-zoom"></script>
       </head>
       <body>
         <div class="container">
-          <div id="data" class="data"></div>
-          <label for="options">Choose an option:</label>
-          <select id="options" name="options">
-            <option value="Option 1">Option 1</option>
-            <option value="Option 2">Option 2</option>
-            <option value="Option 3">Option 3</option>
-          </select>
+          <h1>Temperature Data</h1>
+          <canvas id="chart"></canvas>
           <button id="exportBtn">Export Data</button>
         </div>
         <script>
-          const dataDiv = document.getElementById("data");
-          const options = document.getElementById("options");
           const exportBtn = document.getElementById("exportBtn");
 
-          options.addEventListener('change', (event) => {
-            console.log(event.target.value);
-          });
-
           exportBtn.addEventListener('click', async () => {
-            const response = await fetch("/export");
+            const response = await fetch("/data");
             if (response.ok) {
               const jsonData = await response.json();
               console.log("Exported KV Data:", jsonData);
+              updateChart(jsonData);
             } else {
               alert("Failed to export data");
             }
           });
 
+          const ctx = document.getElementById('chart').getContext('2d');
+
+          let chart = new Chart(ctx, {
+            type: 'line',
+            data: {
+              labels: [],
+              datasets: [
+                {
+                  label: 'Street Temperature',
+                  borderColor: 'rgb(255, 99, 132)',
+                  data: [],
+                  fill: false,
+                },
+                {
+                  label: 'Home Temperature',
+                  borderColor: 'rgb(54, 162, 235)',
+                  data: [],
+                  fill: false,
+                },
+              ],
+            },
+            options: {
+              responsive: true,
+              plugins: {
+                zoom: {
+                  pan: {
+                    enabled: true,
+                    mode: 'x',
+                  },
+                  zoom: {
+                    wheel: {
+                      enabled: true,
+                    },
+                    mode: 'x',
+                  },
+                },
+              },
+              scales: {
+                x: {
+                  type: 'time',
+                  time: {
+                    unit: 'minute',
+                  },
+                  title: {
+                    display: true,
+                    text: 'Time',
+                  },
+                },
+                y: {
+                  title: {
+                    display: true,
+                    text: 'Temperature (°C)',
+                  },
+                },
+              },
+            },
+          });
+
+          function updateChart(data) {
+            const timestamps = [];
+            const streetTemps = [];
+            const homeTemps = [];
+
+            Object.keys(data).forEach(key => {
+              const entry = data[key];
+              timestamps.push(new Date(entry.timestamp));
+              streetTemps.push(entry.street_temp);
+              homeTemps.push(entry.home_temp);
+            });
+
+            chart.data.labels = timestamps;
+            chart.data.datasets[0].data = streetTemps;
+            chart.data.datasets[1].data = homeTemps;
+
+            chart.update();
+          }
+
+          // Загрузка данных при загрузке страницы
           async function loadData() {
             const response = await fetch("/data");
             if (response.ok) {
               const data = await response.json();
-              const formattedData = data.map(entry => \`Time: \${new Date(entry.timestamp).toLocaleString()}, Street Temp: \${entry.street_temp}, Home Temp: \${entry.home_temp}\`).join("\\n");
-              dataDiv.innerText = formattedData;
+              updateChart(data);
             } else {
               alert("Failed to load data");
             }
           }
 
           loadData();
-          setInterval(loadData, 5000);  // Запрос каждые 5 секунд
         </script>
       </body>
       </html>
