@@ -48,82 +48,25 @@ const handler = async (req: Request): Promise<Response> => {
       <body>
         <div class="container">
           <h1>Temperature Data</h1>
-          <canvas id="chart"></canvas>
           <button id="exportBtn">Export Data</button>
+          <canvas id="chart" style="display:none;"></canvas>
         </div>
         <script>
           const exportBtn = document.getElementById("exportBtn");
+          const canvas = document.getElementById('chart');
 
           exportBtn.addEventListener('click', async () => {
             const response = await fetch("/data");
             if (response.ok) {
               const jsonData = await response.json();
               console.log("Exported KV Data:", jsonData);
-              updateChart(jsonData);
+              createChart(jsonData);
             } else {
               alert("Failed to export data");
             }
           });
 
-          const ctx = document.getElementById('chart').getContext('2d');
-
-          let chart = new Chart(ctx, {
-            type: 'line',
-            data: {
-              labels: [],
-              datasets: [
-                {
-                  label: 'Street Temperature',
-                  borderColor: 'rgb(255, 99, 132)',
-                  data: [],
-                  fill: false,
-                },
-                {
-                  label: 'Home Temperature',
-                  borderColor: 'rgb(54, 162, 235)',
-                  data: [],
-                  fill: false,
-                },
-              ],
-            },
-            options: {
-              responsive: true,
-              plugins: {
-                zoom: {
-                  pan: {
-                    enabled: true,
-                    mode: 'x',
-                  },
-                  zoom: {
-                    wheel: {
-                      enabled: true,
-                    },
-                    mode: 'x',
-                  },
-                },
-              },
-              scales: {
-                x: {
-                  type: 'time',
-                  time: {
-                    unit: 'minute',
-                  },
-                  title: {
-                    display: true,
-                    text: 'Time',
-                  },
-                },
-                y: {
-                  title: {
-                    display: true,
-                    text: 'Temperature (°C)',
-                  },
-                },
-              },
-            },
-          });
-
-          function updateChart(data) {
+          function createChart(data) {
             const timestamps = [];
             const streetTemps = [];
             const homeTemps = [];
@@ -135,25 +78,65 @@ const handler = async (req: Request): Promise<Response> => {
               homeTemps.push(entry.home_temp);
             });
 
-            chart.data.labels = timestamps;
-            chart.data.datasets[0].data = streetTemps;
-            chart.data.datasets[1].data = homeTemps;
+            canvas.style.display = "block"; // Показать canvas после загрузки данных
 
-            chart.update();
+            const ctx = canvas.getContext('2d');
+            const chart = new Chart(ctx, {
+              type: 'line',
+              data: {
+                labels: timestamps,
+                datasets: [
+                  {
+                    label: 'Street Temperature',
+                    borderColor: 'rgb(255, 99, 132)',
+                    data: streetTemps,
+                    fill: false,
+                  },
+                  {
+                    label: 'Home Temperature',
+                    borderColor: 'rgb(54, 162, 235)',
+                    data: homeTemps,
+                    fill: false,
+                  },
+                ],
+              },
+              options: {
+                responsive: true,
+                plugins: {
+                  zoom: {
+                    pan: {
+                      enabled: true,
+                      mode: 'x',
+                    },
+                    zoom: {
+                      wheel: {
+                        enabled: true,
+                      },
+                      mode: 'x',
+                    },
+                  },
+                },
+                scales: {
+                  x: {
+                    type: 'time',
+                    time: {
+                      unit: 'minute',
+                    },
+                    title: {
+                      display: true,
+                      text: 'Time',
+                    },
+                  },
+                  y: {
+                    title: {
+                      display: true,
+                      text: 'Temperature (°C)',
+                    },
+                  },
+                },
+              },
+            });
           }
-
-          // Загрузка данных при загрузке страницы
-          async function loadData() {
-            const response = await fetch("/data");
-            if (response.ok) {
-              const data = await response.json();
-              updateChart(data);
-            } else {
-              alert("Failed to load data");
-            }
-          }
-
-          loadData();
         </script>
       </body>
       </html>
