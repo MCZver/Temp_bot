@@ -39,8 +39,25 @@ const handler = async (req: Request): Promise<Response> => {
 <head>
   <style>
     body { font-family: Arial, sans-serif; }
-    .container { max-width: 800px; margin: auto; padding: 20px; }
+    .container { max-width: 800px; margin: auto; padding: 20px; position: relative; }
     canvas { background: #f5f5f5; border: 1px solid #ddd; }
+    .spinner {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      border: 8px solid #f3f3f3;
+      border-top: 8px solid #3498db;
+      border-radius: 50%;
+      width: 60px;
+      height: 60px;
+      animation: spin 1s linear infinite;
+    }
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+    .hidden { display: none; }
   </style>
   <!-- Подключаем Chart.js -->
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
@@ -53,20 +70,30 @@ const handler = async (req: Request): Promise<Response> => {
   <div class="container">
     <h1>Temperature Data</h1>
     <button id="exportBtn">Export Data</button>
-    <canvas id="chart" style="display:none;"></canvas>
+    <div id="spinner" class="spinner"></div>
+    <canvas id="chart" class="hidden"></canvas>
   </div>
   <script>
     const exportBtn = document.getElementById("exportBtn");
     const canvas = document.getElementById('chart');
+    const spinner = document.getElementById('spinner');
 
     exportBtn.addEventListener('click', async () => {
-      const response = await fetch("/data");
-      if (response.ok) {
-        const jsonData = await response.json();
-        console.log("Exported KV Data:", jsonData);
-        createChart(jsonData);
-      } else {
-        alert("Failed to export data");
+      spinner.classList.remove('hidden'); // Показать спиннер
+
+      try {
+        const response = await fetch("/data");
+        if (response.ok) {
+          const jsonData = await response.json();
+          console.log("Exported KV Data:", jsonData);
+          createChart(jsonData);
+        } else {
+          alert("Failed to export data");
+        }
+      } catch (error) {
+        alert("An error occurred while fetching data");
+      } finally {
+        spinner.classList.add('hidden'); // Скрыть спиннер после завершения
       }
     });
 
@@ -85,7 +112,7 @@ const handler = async (req: Request): Promise<Response> => {
       canvas.style.display = "block"; // Показать canvas после загрузки данных
 
       const ctx = canvas.getContext('2d');
-      const chart = new Chart(ctx, {
+      new Chart(ctx, {
         type: 'line',
         data: {
           labels: timestamps,
