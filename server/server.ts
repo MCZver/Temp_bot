@@ -34,7 +34,7 @@ const handler = async (req: Request): Promise<Response> => {
   } else if (req.method === "GET" && url.pathname === "/") {
     return new Response(
       `
-      <!DOCTYPE html>
+     <!DOCTYPE html>
 <html>
 <head>
   <style>
@@ -46,6 +46,8 @@ const handler = async (req: Request): Promise<Response> => {
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <!-- Подключаем адаптер date-fns для Chart.js -->
   <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns"></script>
+  <!-- Подключаем плагин для масштабирования -->
+  <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-zoom"></script>
 </head>
 <body>
   <div class="container">
@@ -108,13 +110,17 @@ const handler = async (req: Request): Promise<Response> => {
             zoom: {
               pan: {
                 enabled: true,
-                mode: 'x',
+                mode: 'xy', // Разрешить панорамирование по обеим осям
               },
               zoom: {
                 wheel: {
                   enabled: true,
+                  speed: 0.1, // Скорость масштабирования колесиком
                 },
-                mode: 'x',
+                pinch: {
+                  enabled: true, // Масштабирование с помощью жестов на мобильных устройствах
+                },
+                mode: 'xy', // Масштабирование по обеим осям
               },
             },
           },
