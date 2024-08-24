@@ -34,7 +34,7 @@ const handler = async (req: Request): Promise<Response> => {
   } else if (req.method === "GET" && url.pathname === "/") {
     return new Response(
       `
-     <!DOCTYPE html>
+      <!DOCTYPE html>
 <html>
 <head>
   <style>
@@ -64,7 +64,7 @@ const handler = async (req: Request): Promise<Response> => {
   <!-- Подключаем адаптер date-fns для Chart.js -->
   <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns"></script>
   <!-- Подключаем плагин для масштабирования -->
-  <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-zoom"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-zoom@1.0.1/dist/chartjs-plugin-zoom.min.js"></script>
 </head>
 <body>
   <div class="container">
@@ -154,7 +154,7 @@ const handler = async (req: Request): Promise<Response> => {
               type: 'time',
               time: {
                 unit: 'minute',
-                tooltipFormat: 'll HH:mm',
+                tooltipFormat: 'll HH:mm', // Используем правильный формат
               },
               title: {
                 display: true,
