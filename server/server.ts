@@ -34,7 +34,7 @@ const handler = async (req: Request): Promise<Response> => {
   } else if (req.method === "GET" && url.pathname === "/") {
     return new Response(
       `
-      <!DOCTYPE html>
+     <!DOCTYPE html>
 <html>
 <head>
   <style>
@@ -74,7 +74,7 @@ const handler = async (req: Request): Promise<Response> => {
   <meta charset="UTF-8">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns@2.0.0"></script> <!-- Подключение адаптера для даты -->
+  <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-moment"></script>
   <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-zoom@1.0.0"></script>
   <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
 </head>
