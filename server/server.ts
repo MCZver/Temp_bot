@@ -103,10 +103,10 @@ const handler = async (req: Request): Promise<Response> => {
       document.getElementById('loading').style.display = 'block';
       const response = await fetch('/data');
       const data = await response.json();
-      const now = new Date();
+      console.log('Полученные данные:', data);  // Вывод данных в консоль
 
       // Глобальная переменная для хранения данных
-      window.chartData = data;
+      window.chartData = Array.isArray(data) ? data : [];  // Убедиться, что данные - это массив
 
       document.getElementById('loading').style.display = 'none';
       updateButtonsState();
@@ -121,7 +121,7 @@ const handler = async (req: Request): Promise<Response> => {
     
     flatpickr("#datepicker", {
       dateFormat: "Y-m-d",
-      onChange: function(selectedDates, dateStr, instance) {
+      onChange: function(selectedDates) {
         if (selectedDates.length > 0) {
           updateChartForDate(selectedDates[0]);
         }
@@ -129,7 +129,7 @@ const handler = async (req: Request): Promise<Response> => {
     });
 
     function updateButtonsState() {
-      const hasData = !!window.chartData;
+      const hasData = Array.isArray(window.chartData) && window.chartData.length > 0;
       document.getElementById('last1HourBtn').disabled = !hasData;
       document.getElementById('last3HoursBtn').disabled = !hasData;
       document.getElementById('last12HoursBtn').disabled = !hasData;
@@ -139,7 +139,7 @@ const handler = async (req: Request): Promise<Response> => {
     }
 
     function updateChart(hours) {
-      if (!window.chartData) return;
+      if (!Array.isArray(window.chartData)) return;
       const end = new Date();
       const start = new Date();
       start.setHours(start.getHours() - hours);
@@ -220,7 +220,7 @@ const handler = async (req: Request): Promise<Response> => {
     }
 
     function updateChartForDate(selectedDate) {
-      if (!window.chartData) return;
+      if (!Array.isArray(window.chartData)) return;
       const start = new Date(selectedDate);
       const end = new Date(selectedDate);
       end.setDate(end.getDate() + 1);
@@ -302,7 +302,6 @@ const handler = async (req: Request): Promise<Response> => {
   </script>
 </body>
 </html>
-
       `,
       { status: 200, headers: { "Content-Type": "text/html" } }
     );
