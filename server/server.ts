@@ -89,7 +89,6 @@ const handler = async (req: Request): Promise<Response> => {
       <button id="last3DaysBtn" disabled>Три дня</button>
       <button id="last7DaysBtn" disabled>Неделя</button>
       <input type="text" id="datepicker" placeholder="Выберите дату">
-      <button id="selectDayBtn" disabled>Выбрать день</button>
     </div>
     <div id="loading">Загрузка данных...</div>
     <div id="chart-container">
