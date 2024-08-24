@@ -38,263 +38,243 @@ const handler = async (req: Request): Promise<Response> => {
 <html>
 <head>
   <style>
-    body {
-      font-family: Arial, sans-serif;
-      margin: 0;
-      padding: 0;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      height: 100vh;
+    body { font-family: Arial, sans-serif; margin: 0; padding: 0; }
+    .container { position: relative; height: 100vh; width: 100vw; }
+    canvas { width: 100%; height: 100%; }
+    .spinner {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      border: 8px solid #f3f3f3;
+      border-top: 8px solid #3498db;
+      border-radius: 50%;
+      width: 60px;
+      height: 60px;
+      animation: spin 1s linear infinite;
     }
-    .container {
-      width: 100%;
-      max-width: 1200px;
-      padding: 20px;
-      box-sizing: border-box;
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
     }
-    .button-group {
-      margin-bottom: 20px;
+    .hidden { display: none; }
+    .buttons {
+      position: absolute;
+      top: 10px;
+      left: 10px;
+      background-color: white;
+      padding: 10px;
+      border-radius: 5px;
+      box-shadow: 0px 0px 5px rgba(0, 0, 0, 0.2);
     }
-    .button-group button {
-      margin-right: 10px;
-    }
-    #chart-container {
-      position: relative;
-      width: 100%;
-      height: 80vh;
-    }
-    #loading {
+    .date-picker-container {
       display: none;
-      font-size: 20px;
-      color: #333;
+      margin-top: 10px;
+    }
+    #calendar {
+      display: inline-block;
+      margin-left: 10px;
     }
   </style>
+  <!-- Подключаем Chart.js -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <!-- Подключаем адаптер date-fns для Chart.js -->
+  <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns"></script>
+  <!-- Подключаем плагин для масштабирования -->
+  <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-zoom@1.0.1/dist/chartjs-plugin-zoom.min.js"></script>
+  <!-- Подключаем flatpickr для календаря -->
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+  <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
 </head>
 <body>
   <div class="container">
-    <div class="button-group">
-      <button id="exportDataBtn">Экспорт данных</button>
-      <button id="last1HourBtn" disabled>Последний час</button>
-      <button id="last3HoursBtn" disabled>Последние три часа</button>
-      <button id="last12HoursBtn" disabled>Последние 12 часов</button>
-      <button id="last24HoursBtn" disabled>Сутки</button>
-      <button id="last3DaysBtn" disabled>Три дня</button>
-      <button id="last7DaysBtn" disabled>Неделя</button>
-      <input type="text" id="datepicker" placeholder="Выберите дату">
+    <div class="buttons">
+      <button id="exportBtn">Export Data</button>
+      <button id="hourBtn" class="hidden">Last Hour</button>
+      <button id="threeHoursBtn" class="hidden">Last 3 Hours</button>
+      <button id="dayBtn" class="hidden">Select Day</button>
+      <div id="date-picker-container" class="date-picker-container">
+        <input id="calendar" type="text" placeholder="Select date" />
+      </div>
     </div>
-    <div id="loading">Загрузка данных...</div>
-    <div id="chart-container">
-      <canvas id="myChart"></canvas>
-    </div>
+    <div id="spinner" class="spinner hidden"></div>
+    <canvas id="chart"></canvas>
   </div>
-
-  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-zoom"></script>
-  <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-moment"></script>
-  <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
   <script>
+    const exportBtn = document.getElementById("exportBtn");
+    const hourBtn = document.getElementById("hourBtn");
+    const threeHoursBtn = document.getElementById("threeHoursBtn");
+    const dayBtn = document.getElementById("dayBtn");
+    const calendar = document.getElementById("calendar");
+    const spinner = document.getElementById('spinner');
+    const canvas = document.getElementById('chart');
     let chart = null;
 
-    document.getElementById('exportDataBtn').addEventListener('click', async () => {
-      document.getElementById('loading').style.display = 'block';
-      const response = await fetch('/data');
-      const data = await response.json();
-      console.log('Полученные данные:', data);
-
-      // Глобальная переменная для хранения данных
-      window.chartData = Array.isArray(data) ? data : [];
-      
-      document.getElementById('loading').style.display = 'none';
-      updateButtonsState(true);
+    // Инициализация календаря
+    let availableDates = [];
+    flatpickr(calendar, {
+      enable: availableDates,
+      onChange: () => plotData('day', calendar.value),
     });
 
-    document.getElementById('last1HourBtn').addEventListener('click', () => updateChart(1));
-    document.getElementById('last3HoursBtn').addEventListener('click', () => updateChart(3));
-    document.getElementById('last12HoursBtn').addEventListener('click', () => updateChart(12));
-    document.getElementById('last24HoursBtn').addEventListener('click', () => updateChart(24));
-    document.getElementById('last3DaysBtn').addEventListener('click', () => updateChart(72));
-    document.getElementById('last7DaysBtn').addEventListener('click', () => updateChart(168));
-    
-    flatpickr("#datepicker", {
-      dateFormat: "Y-m-d",
-      onChange: function(selectedDates) {
-        if (selectedDates.length > 0) {
-          updateChartForDate(selectedDates[0]);
+    exportBtn.addEventListener('click', async () => {
+      spinner.classList.remove('hidden'); // Показать спиннер
+
+      try {
+        const response = await fetch("/data");
+        if (response.ok) {
+          const jsonData = await response.json();
+          console.log("Exported KV Data:", jsonData);
+          showPeriodButtons(jsonData);
+        } else {
+          alert("Failed to export data");
         }
+      } catch (error) {
+        alert("An error occurred while fetching data");
+      } finally {
+        spinner.classList.add('hidden'); // Скрыть спиннер после завершения
       }
     });
 
-    function updateButtonsState(hasData) {
-      document.getElementById('last1HourBtn').disabled = !hasData;
-      document.getElementById('last3HoursBtn').disabled = !hasData;
-      document.getElementById('last12HoursBtn').disabled = !hasData;
-      document.getElementById('last24HoursBtn').disabled = !hasData;
-      document.getElementById('last3DaysBtn').disabled = !hasData;
-      document.getElementById('last7DaysBtn').disabled = !hasData;
+    function showPeriodButtons(data) {
+      hourBtn.classList.remove('hidden');
+      threeHoursBtn.classList.remove('hidden');
+      dayBtn.classList.remove('hidden');
+      updateAvailableDates(data);
     }
 
-    function updateChart(period) {
-      if (!Array.isArray(window.chartData)) return;
-      const end = new Date();
-      const start = new Date();
-      start.setHours(start.getHours() - period);
-
-      const filteredData = window.chartData.filter(item => {
-        const itemDate = new Date(item.timestamp);
-        return itemDate >= start && itemDate <= end;
+    function updateAvailableDates(data) {
+      availableDates = Object.values(data).map(entry => {
+        const date = new Date(entry.timestamp);
+        return date.toISOString().split('T')[0]; // Формат yyyy-mm-dd
       });
+      flatpickr(calendar, { enable: availableDates });
+    }
 
-      const labels = filteredData.map(item => new Date(item.timestamp).toLocaleString());
-      const streetTemps = filteredData.map(item => item.street_temp);
-      const homeTemps = filteredData.map(item => item.home_temp);
+    hourBtn.addEventListener('click', () => plotData('hour'));
+    threeHoursBtn.addEventListener('click', () => plotData('threeHours'));
+    dayBtn.addEventListener('click', () => {
+      calendar.classList.remove('hidden');
+    });
 
+    function plotData(period, date) {
       if (chart) {
-        chart.destroy();
+        chart.destroy(); // Удаляем предыдущий график, если он существует
       }
 
-      const ctx = document.getElementById('myChart').getContext('2d');
+      spinner.classList.remove('hidden'); // Показать спиннер
+
+      fetch("/data")
+        .then(response => response.json())
+        .then(jsonData => {
+          const filteredData = filterData(jsonData, period, date);
+          createChart(filteredData);
+        })
+        .catch(error => {
+          alert("An error occurred while fetching data");
+        })
+        .finally(() => {
+          spinner.classList.add('hidden'); // Скрыть спиннер после завершения
+        });
+    }
+
+    function filterData(data, period, date) {
+      const now = new Date();
+      const filteredData = {};
+      Object.keys(data).forEach(key => {
+        const entry = data[key];
+        const entryDate = new Date(entry.timestamp);
+
+        let include = false;
+        if (period === 'hour') {
+          include = (now - entryDate) < 3600000; // Last hour
+        } else if (period === 'threeHours') {
+          include = (now - entryDate) < 10800000; // Last 3 hours
+        } else if (period === 'day' && date) {
+          const selectedDate = new Date(date);
+          include = entryDate.toDateString() === selectedDate.toDateString();
+        }
+
+        if (include) {
+          filteredData[key] = entry;
+        }
+      });
+      return filteredData;
+    }
+
+    function createChart(data) {
+      const timestamps = [];
+      const streetTemps = [];
+      const homeTemps = [];
+
+      Object.keys(data).forEach(key => {
+        const entry = data[key];
+        timestamps.push(new Date(entry.timestamp));
+        streetTemps.push(entry.street_temp);
+        homeTemps.push(entry.home_temp);
+      });
+
+      const ctx = canvas.getContext('2d');
       chart = new Chart(ctx, {
         type: 'line',
         data: {
-          labels: labels,
+          labels: timestamps,
           datasets: [
             {
-              label: 'Street Temp',
+              label: 'Street Temperature',
+              borderColor: 'rgb(255, 99, 132)',
               data: streetTemps,
-              borderColor: 'blue',
-              fill: false
+              fill: false,
             },
             {
-              label: 'Home Temp',
+              label: 'Home Temperature',
+              borderColor: 'rgb(54, 162, 235)',
               data: homeTemps,
-              borderColor: 'red',
-              fill: false
-            }
-          ]
+              fill: false,
+            },
+          ],
         },
         options: {
           responsive: true,
+          maintainAspectRatio: false, // График будет занимать всю доступную область
           plugins: {
             zoom: {
+              pan: {
+                enabled: true,
+                mode: 'xy', // Разрешить панорамирование по обеим осям
+              },
               zoom: {
                 wheel: {
                   enabled: true,
+                  speed: 0.1, // Скорость масштабирования колесиком
                 },
                 pinch: {
-                  enabled: true
+                  enabled: true, // Масштабирование с помощью жестов на мобильных устройствах
                 },
-                mode: 'xy'
+                mode: 'xy', // Масштабирование по обеим осям
               },
-              pan: {
-                enabled: true,
-                mode: 'xy'
-              }
-            }
+            },
           },
           scales: {
             x: {
               type: 'time',
               time: {
-                unit: 'hour',
-                tooltipFormat: 'll HH:mm'
+                unit: 'minute',
+                tooltipFormat: 'll HH:mm', // Используем правильный формат
               },
               title: {
                 display: true,
-                text: 'Time'
-              }
+                text: 'Time',
+              },
             },
             y: {
               title: {
                 display: true,
-                text: 'Temperature'
-              }
-            }
-          }
-        }
-      });
-    }
-
-    function updateChartForDate(selectedDate) {
-      if (!Array.isArray(window.chartData)) return;
-      const start = new Date(selectedDate);
-      const end = new Date(selectedDate);
-      end.setDate(end.getDate() + 1);
-
-      const filteredData = window.chartData.filter(item => {
-        const itemDate = new Date(item.timestamp);
-        return itemDate >= start && itemDate < end;
-      });
-
-      const labels = filteredData.map(item => new Date(item.timestamp).toLocaleString());
-      const streetTemps = filteredData.map(item => item.street_temp);
-      const homeTemps = filteredData.map(item => item.home_temp);
-
-      if (chart) {
-        chart.destroy();
-      }
-
-      const ctx = document.getElementById('myChart').getContext('2d');
-      chart = new Chart(ctx, {
-        type: 'line',
-        data: {
-          labels: labels,
-          datasets: [
-            {
-              label: 'Street Temp',
-              data: streetTemps,
-              borderColor: 'blue',
-              fill: false
-            },
-            {
-              label: 'Home Temp',
-              data: homeTemps,
-              borderColor: 'red',
-              fill: false
-            }
-          ]
-        },
-        options: {
-          responsive: true,
-          plugins: {
-            zoom: {
-              zoom: {
-                wheel: {
-                  enabled: true,
-                },
-                pinch: {
-                  enabled: true
-                },
-                mode: 'xy'
+                text: 'Temperature (°C)',
               },
-              pan: {
-                enabled: true,
-                mode: 'xy'
-              }
-            }
+            },
           },
-          scales: {
-            x: {
-              type: 'time',
-              time: {
-                unit: 'hour',
-                tooltipFormat: 'll HH:mm'
-              },
-              title: {
-                display: true,
-                text: 'Time'
-              }
-            },
-            y: {
-              title: {
-                display: true,
-                text: 'Temperature'
-              }
-            }
-          }
-        }
+        },
       });
     }
   </script>
