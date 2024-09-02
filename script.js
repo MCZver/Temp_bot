@@ -116,11 +116,11 @@ window.addEventListener('DOMContentLoaded', async () => {
 		window.Telegram.WebApp.ready();
 		window.Telegram.WebApp.expand();
 		// Получение языка пользователя
-		const userLanguage = window.Telegram.WebApp.initDataUnsafe.user.language_code || 'ru';
-		//const userLanguage = 'uk';
+		//const userLanguage = window.Telegram.WebApp.initDataUnsafe.user.language_code || 'ru';
+		const userLanguage = 'uk';
 		// Определяем переменную colorScheme
-		const colorScheme = window.Telegram.WebApp.colorScheme;
-		//const colorScheme = 'dark'; // Значение может быть 'white' или 'dark'
+		//const colorScheme = window.Telegram.WebApp.colorScheme;
+		const colorScheme = 'dark'; // Значение может быть 'white' или 'dark'
 		console.log(window.Telegram.WebApp);
 		
         // Получение текущей даты и даты через два дня
@@ -169,11 +169,13 @@ window.addEventListener('DOMContentLoaded', async () => {
         const weatherDataContainer = document.getElementById('weather-data');
 		const titleContainer = document.getElementById('title');
 		if(userLanguage === "ru") {
-				titleContainer.insertAdjacentHTML('beforeend', 'Прогноз погоды');
+				//Лишний заголовок
+				//titleContainer.insertAdjacentHTML('beforeend', 'Прогноз погоды');
 				buttonLabels = ['Сегодня', 'Завтра', 'Послезавтра'];
 			}
 			if(userLanguage === "uk") {
-				titleContainer.insertAdjacentHTML('beforeend', 'Прогноз погоди');
+				//Зайвий заголовок
+				//titleContainer.insertAdjacentHTML('beforeend', 'Прогноз погоди');
 				buttonLabels = ['Сьогодні', 'Завтра', 'Післязавтра'];
 			}
         time.forEach((date, index) => {
@@ -184,13 +186,14 @@ window.addEventListener('DOMContentLoaded', async () => {
 
             const weatherHtml_ru = `
                 <div id="date-${index}" class="weather-info" style="display: none;">
-                    <h2 class="date-heading">${formatDate(new Date(date))} (${buttonLabels[index]})</h2>
+                    <h2 class="date-heading">${buttonLabels[index]}</h2>
+					<h3 class="date-heading">${formatDate(new Date(date))}</h3>
 					<div class="weather-details">
 						<p><strong>Описание погоды:</strong> ${weatherCodeToDescription_ru(weather_code[index])}</p>
-						<p><strong>Макс. температура:</strong> ${temperature_2m_max[index]}°C</p>
-						<p><strong>Мин. температура:</strong> ${temperature_2m_min[index]}°C</p>
-						<p><strong>Макс. температура по ощущениям:</strong> ${apparent_temperature_max[index]}°C</p>
-						<p><strong>Мин. температура по ощущениям:</strong> ${apparent_temperature_min[index]}°C</p>
+						<p><strong>Макс. t°:</strong> ${temperature_2m_max[index]}°C</p>
+						<p><strong>Мин. t°:</strong> ${temperature_2m_min[index]}°C</p>
+						<p><strong>Макс. t° по ощущениям:</strong> ${apparent_temperature_max[index]}°C</p>
+						<p><strong>Мин. t° по ощущениям:</strong> ${apparent_temperature_min[index]}°C</p>
 						<p><strong>Вероятность осадков:</strong> ${precipitation_probability_max[index]}%</p>
 						<p><strong>Макс. скорость ветра:</strong> ${wind_speed_10m_max[index]} км/ч</p>
 						<p><strong>Средняя влажность:</strong> ${calculateDailyAverageHumidity(hourlyHumidity, hourlyTimes, date)}%</p>
@@ -203,14 +206,15 @@ window.addEventListener('DOMContentLoaded', async () => {
 			
 			const weatherHtml_ua = `
                 <div id="date-${index}" class="weather-info" style="display: none;">
-                    <h2 class="date-heading">${formatDate(new Date(date))} (${buttonLabels[index]})</h2>
+				    <p class="date-heading">${buttonLabels[index]}</p>
+                    <p class="date-heading">${formatDate(new Date(date))}</p>
 			<div class="weather-details">
 				<p><strong>Опис погоди:</strong> ${weatherCodeToDescription_ua(weather_code[index])}</p>
-				<p><strong>Макс. температура:</strong> ${temperature_2m_max[index]}°C</p>
-				<p><strong>Мін. температура:</strong> ${temperature_2m_min[index]}°C</p>
-				<p><strong>Макс. температура по відчуттям:</strong> ${apparent_temperature_max[index]}°C</p>
-				<p><strong>Мін. температура по відчуттям:</strong> ${apparent_temperature_min[index]}°C</p>
-				<p><strong>Можливість опадів:</strong> ${precipitation_probability_max[index]}%</p>
+				<p><strong>Макс. t°:</strong> ${temperature_2m_max[index]}°C
+				<strong>Мін. t°:</strong> ${temperature_2m_min[index]}°C</p>
+				<p><strong>Макс. t° по відчуттям:</strong> ${apparent_temperature_max[index]}°C</p>
+				<p><strong>Мін. t° по відчуттям:</strong> ${apparent_temperature_min[index]}°C</p>
+				<p><strong>Вірогідність опадів:</strong> ${precipitation_probability_max[index]}%</p>
 				<p><strong>Макс. швидкість вітру:</strong> ${wind_speed_10m_max[index]} км/ч</p>
 				<p><strong>Середня вологість:</strong> ${calculateDailyAverageHumidity(hourlyHumidity, hourlyTimes, date)}%</p>
 				<p><strong>Схід сонця:</strong> ${formatDateTime(new Date(sunrise[index]))}</p>
