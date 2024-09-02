@@ -1,0 +1,70 @@
+body.light-theme {
+    background-color: white; /* Светлый фон */
+    color: black;
+    font-family: Arial, sans-serif;
+}
+body.dark-theme {
+    background-color: #121212; /* Темный фон */
+    color: white;
+    font-family: 'Arial', monospace;
+}
+table {
+    border-collapse: collapse;
+    width: 100%;
+}
+th, td {
+    border: 1px solid black;
+    padding: 8px;
+    text-align: left;
+}
+th {
+    background-color: #f2f2f2; /* Светлый фон заголовков таблицы */
+}
+body.dark-theme th {
+    background-color: #333; /* Темный фон заголовков таблицы */
+}
+#buttons {
+    margin: 20px 0;
+    text-align: center; /* Центрируем текст по горизонтали */
+}
+button {
+    margin: 5px;
+    padding: 10px;
+    font-size: 16px;
+    border: none;
+    cursor: pointer;
+}
+.light-theme, .dark-theme button {
+    border-radius: 10px;
+}
+.light-theme, .dark-theme button:hover {
+    border-radius: 13px;
+}
+.light-theme button {
+    background-color: #f0f0f0; /* Светлый фон кнопок */
+    color: black;
+}
+.light-theme button:hover {
+    background-color: #e0e0e0; /* Фон при наведении для светлой темы */
+}
+.dark-theme button {
+    background-color: #333; /* Темный фон кнопок */
+    color: white;
+}
+.dark-theme button:hover {
+    background-color: #555; /* Фон при наведении для темной темы */
+}
+.weather-info {
+    margin-top: 20px;
+    margin-bottom: 20px;
+}
+.date-heading {
+    text-align: center; /* Центрируем заголовок по горизонтали */
+    margin: 20px 0;
+}
+
+.weather-details {
+    max-width: 60%; /* Максимальная ширина блока */
+    margin: 0 auto; /* Центрируем блок по горизонтали */
+    text-align: left; /* Текст внутри блока выравниваем по левому краю */
+}
