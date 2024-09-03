@@ -21,7 +21,7 @@ th {
     background-color: #f2f2f2; /* Светлый фон заголовков таблицы */
 }
 body.dark-theme th {
-    background-color: #333; /* Темный фон заголовков таблицы */
+    background-color: #333; /* Темный фон заголовков таблицы */ 
 }
 #buttons {
     margin: 20px 0;
@@ -64,7 +64,39 @@ button {
 }
 
 .weather-details {
-    max-width: 60%; /* Максимальная ширина блока */
+    display: block;
+    max-width: 265px; /* Максимальная ширина блока */
     margin: 0 auto; /* Центрируем блок по горизонтали */
-    text-align: left; /* Текст внутри блока выравниваем по левому краю */
+    padding: 35px;
+    border-top-left-radius: 3vh;
+    border-top-right-radius: 3vh;
+    box-shadow: inset 0.15em 0.15em #3700b3;
+    
+    
+    
+    
+    
+      font-family: "Oswald";
+      font-optical-sizing: auto;
+      font-weight: 100;
+      font-style: normal;
+    
+
+    
+    text-align: center; /* Текст внутри блока выравниваем по левому краю */
+    background-color: #018786;
+    
+}
+
+.weather-details-extended {
+    display: block;
+    max-width: 265px; /* Максимальная ширина блока */
+    margin: 0 auto; /* Центрируем блок по горизонтали */
+    padding: 35px;
+    border-bottom-left-radius: 3vh;
+    border-bottom-right-radius: 3vh;
+    box-shadow: inset 0.15em -0.15em #6200EE;
+    
+    text-align: center; /* Текст внутри блока выравниваем по левому краю */
+    background-color:  #03DAC6;
 }

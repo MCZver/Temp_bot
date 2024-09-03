@@ -169,12 +169,12 @@ window.addEventListener('DOMContentLoaded', async () => {
         const weatherDataContainer = document.getElementById('weather-data');
 		const titleContainer = document.getElementById('title');
 		if(userLanguage === "ru") {
-				//Лишний заголовок
+				//Лишний заголовок grm
 				//titleContainer.insertAdjacentHTML('beforeend', 'Прогноз погоды');
 				buttonLabels = ['Сегодня', 'Завтра', 'Послезавтра'];
 			}
 			if(userLanguage === "uk") {
-				//Зайвий заголовок
+				//Зайвий заголовок grm
 				//titleContainer.insertAdjacentHTML('beforeend', 'Прогноз погоди');
 				buttonLabels = ['Сьогодні', 'Завтра', 'Післязавтра'];
 			}
@@ -185,42 +185,46 @@ window.addEventListener('DOMContentLoaded', async () => {
             buttonsContainer.appendChild(button);
 
             const weatherHtml_ru = `
-                <div id="date-${index}" class="weather-info" style="display: none;">
+                <div id="date-${index}" class="weather-info">
                     <h2 class="date-heading">${buttonLabels[index]}</h2>
 					<h3 class="date-heading">${formatDate(new Date(date))}</h3>
 					<div class="weather-details">
 						<p><strong>Описание погоды:</strong> ${weatherCodeToDescription_ru(weather_code[index])}</p>
 						<p><strong>Макс. t°:</strong> ${temperature_2m_max[index]}°C</p>
 						<p><strong>Мин. t°:</strong> ${temperature_2m_min[index]}°C</p>
-						<p><strong>Макс. t° по ощущениям:</strong> ${apparent_temperature_max[index]}°C</p>
-						<p><strong>Мин. t° по ощущениям:</strong> ${apparent_temperature_min[index]}°C</p>
 						<p><strong>Вероятность осадков:</strong> ${precipitation_probability_max[index]}%</p>
 						<p><strong>Макс. скорость ветра:</strong> ${wind_speed_10m_max[index]} км/ч</p>
+						<p><strong>Продолжительность дня:</strong> ${Math.round(daylight_duration[index] / 3600)} ч</p>
+					</div>
+					<div class="weather-details-extended">
+						<p><strong>Макс. t° по ощущениям:</strong> ${apparent_temperature_max[index]}°C</p>
+						<p><strong>Мин. t° по ощущениям:</strong> ${apparent_temperature_min[index]}°C</p>
 						<p><strong>Средняя влажность:</strong> ${calculateDailyAverageHumidity(hourlyHumidity, hourlyTimes, date)}%</p>
 						<p><strong>Восход:</strong> ${formatDateTime(new Date(sunrise[index]))}</p>
 						<p><strong>Заката:</strong> ${formatDateTime(new Date(sunset[index]))}</p>
-						<p><strong>Продолжительность дня:</strong> ${Math.round(daylight_duration[index] / 3600)} ч</p>
 					</div>
                 </div>
             `;
 			
 			const weatherHtml_ua = `
-                <div id="date-${index}" class="weather-info" style="display: none;">
+                <div id="date-${index}" class="weather-info">
 				    <p class="date-heading">${buttonLabels[index]}</p>
                     <p class="date-heading">${formatDate(new Date(date))}</p>
-			<div class="weather-details">
-				<p><strong>Опис погоди:</strong> ${weatherCodeToDescription_ua(weather_code[index])}</p>
-				<p><strong>Макс. t°:</strong> ${temperature_2m_max[index]}°C
-				<strong>Мін. t°:</strong> ${temperature_2m_min[index]}°C</p>
-				<p><strong>Макс. t° по відчуттям:</strong> ${apparent_temperature_max[index]}°C</p>
-				<p><strong>Мін. t° по відчуттям:</strong> ${apparent_temperature_min[index]}°C</p>
-				<p><strong>Вірогідність опадів:</strong> ${precipitation_probability_max[index]}%</p>
-				<p><strong>Макс. швидкість вітру:</strong> ${wind_speed_10m_max[index]} км/ч</p>
-				<p><strong>Середня вологість:</strong> ${calculateDailyAverageHumidity(hourlyHumidity, hourlyTimes, date)}%</p>
-				<p><strong>Схід сонця:</strong> ${formatDateTime(new Date(sunrise[index]))}</p>
-				<p><strong>Захід сонця:</strong> ${formatDateTime(new Date(sunset[index]))}</p>
-				<p><strong>Тривалість дня:</strong> ${Math.round(daylight_duration[index] / 3600)} г</p>
-			</div>
+					<div class="weather-details">
+						<p><strong>Опис погоди:</strong> ${weatherCodeToDescription_ua(weather_code[index])}</p>
+						<p><strong>Макс. t°:</strong> ${temperature_2m_max[index]}°C
+						<strong>Мін. t°:</strong> ${temperature_2m_min[index]}°C</p>
+						<p><strong>Вірогідність опадів:</strong> ${precipitation_probability_max[index]}%</p>
+						<p><strong>Макс. швидкість вітру:</strong> ${wind_speed_10m_max[index]} км/ч</p>
+						<p><strong>Тривалість дня:</strong> ${Math.round(daylight_duration[index] / 3600)} г</p>
+					</div>
+					<div class="weather-details-extended">
+						<p><strong>Макс. t° по відчуттям:</strong> ${apparent_temperature_max[index]}°C</p>
+						<p><strong>Мін. t° по відчуттям:</strong> ${apparent_temperature_min[index]}°C</p>
+						<p><strong>Середня вологість:</strong> ${calculateDailyAverageHumidity(hourlyHumidity, hourlyTimes, date)}%</p>
+						<p><strong>Схід сонця:</strong> ${formatDateTime(new Date(sunrise[index]))}</p>
+						<p><strong>Захід сонця:</strong> ${formatDateTime(new Date(sunset[index]))}</p>
+					</div>
                 </div>
             `;
 			
