@@ -164,11 +164,11 @@ window.addEventListener('DOMContentLoaded', async () => {
 		window.Telegram.WebApp.ready();
 		window.Telegram.WebApp.expand();
 		// Получение языка пользователя
-		//const userLanguage = window.Telegram.WebApp.initDataUnsafe.user.language_code || 'ru';
-		const userLanguage = 'uk';
+		const userLanguage = window.Telegram.WebApp.initDataUnsafe.user.language_code;
+		//const userLanguage = 'uk';
 		// Определяем переменную colorScheme
-		//const colorScheme = window.Telegram.WebApp.colorScheme;
-		const colorScheme = 'dark'; // Значение может быть 'white' или 'dark'
+		const colorScheme = window.Telegram.WebApp.colorScheme;
+		//const colorScheme = 'dark'; // Значение может быть 'white' или 'dark'
 		console.log(window.Telegram.WebApp);
 		
         // Получение текущей даты и даты через два дня
