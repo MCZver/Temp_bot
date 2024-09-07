@@ -172,6 +172,7 @@ button {
     max-width: 280px; /* Максимальная ширина блока */
     margin: 0 auto; /* Центрируем блок по горизонтали */
     padding: 10px 20px;
+    list-style: none;
     transition: 1s ease-in;
 
         font-family: "Roboto";
@@ -189,6 +190,7 @@ button {
     max-width: 280px; /* Максимальная ширина блока */
     margin: 0 auto; /* Центрируем блок по горизонтали */
     padding: 10px 20px;
+    list-style: none;
     transition: 1s ease-in;
 
         font-family: "Roboto";
@@ -199,7 +201,3 @@ button {
     border-bottom-left-radius: 48px;
     border-bottom-right-radius: 48px;
 }
-
-
-
-

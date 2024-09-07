@@ -28,74 +28,6 @@ let isClicked = false;
 // Форматирование даты в ISO строку yyyy-mm-dd
 const formatDateToResponse = (date) => date.toISOString().split('T')[0];
 
-// Пример функции для преобразования кодов погоды в описания
-const weatherCodeToDescription_ru = (code) => {
-    switch (code) {
-        case 0: return "Чистое небо"
-		case 1: return "Предпочтительно ясно"
-		case 2: return "Облачно"
-		case 3: return "Переменная облачность"
-		case 45: return "Туман"
-		case 48: return "Иний"
-		case 51: return "Слабая морось"
-		case 53: return "Мряка"
-		case 55: return "Густой туман"
-		case 56: return "Легкий ледяной дождь"
-		case 57: return "Сильный ледяной дождь"
-		case 61: return "Слабый дождь"
-		case 63: return "Дождь"
-		case 65: return "Сильный дождь"
-		case 66: return "Слабый град"
-		case 67: return "Сильный град"
-		case 71: return "Слабый снегопад"
-		case 73: return "Снегопад"
-		case 75: return "Сильный снегопад"
-		case 77: return "Снежные крупинки"
-		case 80: return "Небольшой ливень"
-		case 81: return "Ливень"
-		case 82: return "Сильный ливень"
-		case 85: return "Небольшая метель"
-		case 86: return "Сильная метель"
-		case 95: return "Гроза"
-		case 96: return "Гроза с градом"
-		case 99: return "Гроза с сильным градом"
-    }
-};
-
-const weatherCodeToDescription_ua = (code) => {
-    switch (code) {
-        case 0: return "Чисте небо"
-		case 1: return "Переважно ясно"
-		case 2: return "Мінлива хмарність"
-		case 3: return "Похмуро"
-		case 45: return "Туман"
-		case 48: return "Іній"
-		case 51: return "Слабка мряка"
-		case 53: return "Мряка"
-		case 55: return "Густа мряка"
-		case 56: return "Легкий крижаний дощ"
-		case 57: return "Сильний крижаний дощ"
-		case 61: return "Слабкий дощ"
-		case 63: return "Дощ"
-		case 65: return "Сильний дощ"
-		case 66: return "Слабкий град"
-		case 67: return "Сильний град"
-		case 71: return "Слабкий снігопад"
-		case 73: return "Снігопад"
-		case 75: return "Сильний снігопад"
-		case 77: return "Снігові крупинки"
-		case 80: return "Невелика злива"
-		case 81: return "Злива"
-		case 82: return "Сильна злива"
-		case 85: return "Невелика завірюха"
-		case 86: return "Сильна завірюха"
-		case 95: return "Гроза"
-		case 96: return "Гроза з градом"
-		case 99: return "Гроза з сильним градом"
-        default: return "Невідомо";
-    }
-};
-
 // Функция для расчета среднего значения влажности для каждого дня
 const calculateDailyAverageHumidity = (hourlyHumidity, hourlyTimes, date) => {
 	const dateStart = new Date(date);
@@ -156,6 +88,26 @@ function handleClick() {
     // Toggle the flag
     isClicked = !isClicked;
 }
+/*загрузка перевода из файла*/
+async function loadTranslations() {
+	try {
+		const response = await fetch('translations.json'); // Загружаем JSON файл
+		const translations = await response.json();// Преобразуем его в объект
+		return translations;
+	} catch (error) {
+		console.error('Ошибка загрузки файла перевода:', error);
+		return null;
+	}
+}
+
+// Функция для получения перевода по ключу и языку
+function getTranslation(translations, key, language) {
+	if (translations[key] && translations[key][language]) {
+		return translations[key][language];
+	} else {
+		return translations[key]["uk"]; // Значение по умолчанию
+	}
+}
 
 // Инициализация данных при загрузке страницы
 window.addEventListener('DOMContentLoaded', async () => {
@@ -163,7 +115,7 @@ window.addEventListener('DOMContentLoaded', async () => {
 		/*вывод переменных языка и цветовой схемы отдельно*/
 		let userLanguage; 
 		let colorScheme;
-
+		const translations = await loadTranslations();
 		let buttonLabels = [];
 		window.Telegram.WebApp.ready();
 		window.Telegram.WebApp.expand();
@@ -171,18 +123,13 @@ window.addEventListener('DOMContentLoaded', async () => {
 		// Проверка параметра "testmode" в URL, при значении true мы отвязываемся от телеграмм api
         const urlParams = new URLSearchParams(window.location.search);
         if (urlParams.get('testmode') === 'true') {
-            userLanguage = 'uk';
+            userLanguage = 'en';
 			colorScheme = 'dark'; // Значение может быть 'white' или 'dark'
         } else	{
 			userLanguage = window.Telegram.WebApp.initDataUnsafe.user.language_code;
 			colorScheme = window.Telegram.WebApp.colorScheme;
 		}
-		// Получение языка пользователя
-		//const userLanguage = window.Telegram.WebApp.initDataUnsafe.user.language_code;
-		//const userLanguage = 'uk';
-		// Определяем переменную colorScheme
-		//const colorScheme = window.Telegram.WebApp.colorScheme;
-		//const colorScheme = 'dark'; // Значение может быть 'white' или 'dark'
+		//console.clear();
 		console.log(window.Telegram.WebApp);
 		
         // Получение текущей даты и даты через два дня
@@ -230,23 +177,16 @@ window.addEventListener('DOMContentLoaded', async () => {
         const buttonsContainer = document.getElementById('buttons');
         const weatherDataContainer = document.getElementById('weather-data');
 		const titleContainer = document.getElementById('title');
-		if(userLanguage === "ru") {
-				//Лишний заголовок grm
-				//titleContainer.insertAdjacentHTML('beforeend', 'Прогноз погоды');
-				buttonLabels = ['Сегодня', 'Завтра', 'Послезавтра'];
-			}
-			if(userLanguage === "uk" || userLanguage === "en") {
-				//Зайвий заголовок grm
-				//titleContainer.insertAdjacentHTML('beforeend', 'Прогноз погоди');
-				buttonLabels = ['Сьогодні', 'Завтра', 'Післязавтра'];
-			}
+		//Лишний заголовок grm
+		//titleContainer.insertAdjacentHTML('beforeend', 'Прогноз погоды');
+		buttonLabels = translations.buttonLabels[userLanguage];
         time.forEach((date, index) => {
             const button = document.createElement('button');
             button.innerText = buttonLabels[index];
             button.onclick = () => showWeather(index);
             buttonsContainer.appendChild(button);
 				
-            const weatherHtml_ru = `
+            /*const weatherHtml_ru = `
                 <div id="date-${index}" class="weather-info">
                     <p class="date-heading">${buttonLabels[index]}</p>
 					<p class="date-heading">${formatDate(new Date(date))}</p>
@@ -269,29 +209,29 @@ window.addEventListener('DOMContentLoaded', async () => {
 									<p>Заката: ${formatDateTime(new Date(sunset[index]))}</p>
 								</div>
                 </div>
-            `;
+            `;*/
 			
-			const weatherHtml_ua = `
+			const weatherHtml = `
                 <div id="date-${index}" class="weather-info">
 				    <p class="date-heading">${buttonLabels[index]}</p>
                     <p class="date-heading">${formatDate(new Date(date))}</p>
 					<div class="weather-details">
-						<p>${weatherCodeToDescription_ua(weather_code[index])}</p>
-						<p>Макс. t°: ${temperature_2m_max[index]}°C
-						Мін. t°: ${temperature_2m_min[index]}°C</p>
-						<p>Вірогідність опадів: ${precipitation_probability_max[index]}%</p>
-						<p>Макс. шв. вітру: ${wind_speed_10m_max[index]} км/ч</p>
-						<p>Тривалість дня: ${Math.round(daylight_duration[index] / 3600)} г</p>
+						<p>${getTranslation(translations, weather_code[index], userLanguage)}</p> <!--выводим значение погоды получая перевод из файла json, в функцию передаем индекс погоды и получаем значение для нужного языка -->
+						<p>${getTranslation(translations, "max_t", userLanguage)}: ${temperature_2m_max[index]}°C
+						   ${getTranslation(translations, "min_t", userLanguage)}: ${temperature_2m_min[index]}°C</p>
+						<p>${getTranslation(translations, "chance_of_precipitation", userLanguage)}: ${precipitation_probability_max[index]}%</p>
+						<p>${getTranslation(translations, "max_speed_wind", userLanguage)}: ${wind_speed_10m_max[index]} ${getTranslation(translations, "km_h", userLanguage)}</p>
+						<p>${getTranslation(translations, "day_length", userLanguage)}: ${Math.round(daylight_duration[index] / 3600)} ${getTranslation(translations, "hours", userLanguage)}</p>
 					</div>
 					<div id="detailed">
         				<details class="summ-det">
-            				<summary class="summ" onclick="handleClick()">Детальніше</summary>
+            				<summary class="summ" onclick="handleClick()">${getTranslation(translations, "read_more", userLanguage)}</summary>
             					<div class="weather-details-extended">
-									<p>Макс. t° по відчуттям: ${apparent_temperature_max[index]}°C</p>
-									<p>Мін. t° по відчуттям: ${apparent_temperature_min[index]}°C</p>
-									<p>Середня вологість: ${calculateDailyAverageHumidity(hourlyHumidity, hourlyTimes, date)}%</p>
-									<p>Схід сонця: ${formatDateTime(new Date(sunrise[index]))}</p>
-									<p>Захід сонця: ${formatDateTime(new Date(sunset[index]))}</p>
+									<p>${getTranslation(translations, "max_t_sensations", userLanguage)}: ${apparent_temperature_max[index]}°C</p>
+									<p>${getTranslation(translations, "min_t_sensations", userLanguage)}: ${apparent_temperature_min[index]}°C</p>
+									<p>${getTranslation(translations, "humidity", userLanguage)}: ${calculateDailyAverageHumidity(hourlyHumidity, hourlyTimes, date)}%</p>
+									<p>${getTranslation(translations, "sunrise", userLanguage)}: ${formatDateTime(new Date(sunrise[index]))}</p>
+									<p>${getTranslation(translations, "sunset", userLanguage)}: ${formatDateTime(new Date(sunset[index]))}</p>
 								</div>
         				</details>
     				</div>
@@ -299,12 +239,7 @@ window.addEventListener('DOMContentLoaded', async () => {
                 </div>
             `;
 			
-			if(userLanguage === "ru") {
-				weatherDataContainer.insertAdjacentHTML('beforeend', weatherHtml_ru);
-			}
-			if(userLanguage === "uk" || userLanguage === "en") {
-				weatherDataContainer.insertAdjacentHTML('beforeend', weatherHtml_ua);
-			}
+			weatherDataContainer.insertAdjacentHTML('beforeend', weatherHtml);
 			
 			if (colorScheme === 'white') {
 				document.body.classList.add('light-theme');

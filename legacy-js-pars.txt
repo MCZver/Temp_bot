@@ -1,0 +1,33 @@
+// Пример функции для преобразования кодов погоды в описания
+/*const weatherCodeToDescription_ru = (code) => {
+    switch (code) {
+        case 0: return "Чистое небо"
+		case 1: return "Предпочтительно ясно"
+		case 2: return "Облачно"
+		case 3: return "Переменная облачность"
+		case 45: return "Туман"
+		case 48: return "Иний"
+		case 51: return "Слабая морось"
+		case 53: return "Мряка"
+		case 55: return "Густой туман"
+		case 56: return "Легкий ледяной дождь"
+		case 57: return "Сильный ледяной дождь"
+		case 61: return "Слабый дождь"
+		case 63: return "Дождь"
+		case 65: return "Сильный дождь"
+		case 66: return "Слабый град"
+		case 67: return "Сильный град"
+		case 71: return "Слабый снегопад"
+		case 73: return "Снегопад"
+		case 75: return "Сильный снегопад"
+		case 77: return "Снежные крупинки"
+		case 80: return "Небольшой ливень"
+		case 81: return "Ливень"
+		case 82: return "Сильный ливень"
+		case 85: return "Небольшая метель"
+		case 86: return "Сильная метель"
+		case 95: return "Гроза"
+		case 96: return "Гроза с градом"
+		case 99: return "Гроза с сильным градом"
+    }
+};*/
