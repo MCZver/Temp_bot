@@ -9,10 +9,21 @@ const formatDateTime = (date) => {
     const day = String(date.getDate()).padStart(2, '0');
     const month = String(date.getMonth() + 1).padStart(2, '0'); // Месяцы начинаются с 0
     const year = date.getFullYear();
-	const hour = date.getHours();
-	const minute = date.getMinutes();
+	let hour = date.getHours();
+	let minute = date.getMinutes();
+	
+	if (hour < 10) {
+		hour = "0" + hour;
+	}
+	if (minute < 10) {
+		minute = "0" + minute;
+	}
+
     return `${hour}:${minute}`;
 };
+
+//Переменная для отслеживания нажатия кнопки "Детальнее" grm
+let isClicked = false;
 
 // Форматирование даты в ISO строку yyyy-mm-dd
 const formatDateToResponse = (date) => date.toISOString().split('T')[0];
@@ -107,6 +118,43 @@ function showWeather(index) {
     document.querySelectorAll('.weather-info').forEach(el => el.style.display = 'none');
     // Показать только выбранные данные
     document.getElementById('date-' + index).style.display = 'block';
+	//Обнуляем параметр Open елемента details
+	document.querySelectorAll('.summ-det').forEach(el => {
+		el.removeAttribute('open');
+	});
+	//Отслеживаем нажатие на кнопку выбора дня и обнуляем стили кнопки и блока "Дополнительно"
+	document.querySelectorAll('.summ').forEach(el => {
+            el.style.borderBottomLeftRadius = '48px';
+            el.style.borderBottomRightRadius = '48px';
+            //el.style.transition = '1s ease-in';
+    });
+	
+	//Возвращаем значение нажатий кнопки "Дополнительно"
+	isClicked = false;
+}
+
+
+//Обработка изменения стилей при нажатии на кнопку "Дополнительно"
+function handleClick() {
+    console.log('Summary clicked!'); 
+
+    document.querySelectorAll('.summ').forEach(el => {
+        if (!isClicked) {
+            //применяем стили при нажатии кнопки "Дополнительно"
+            el.style.borderBottomLeftRadius = '0px';
+            el.style.borderBottomRightRadius = '0px';
+            el.style.transition = '0.2s';
+			el.style.transition = 'ease-in';
+        } else {
+            //Возвращаем исходные
+            el.style.borderBottomLeftRadius = '';
+            el.style.borderBottomRightRadius = '';
+            el.style.transition = '0.2s'; 
+        }
+    });
+
+    // Toggle the flag
+    isClicked = !isClicked;
 }
 
 // Инициализация данных при загрузке страницы
@@ -116,7 +164,7 @@ window.addEventListener('DOMContentLoaded', async () => {
 		window.Telegram.WebApp.ready();
 		window.Telegram.WebApp.expand();
 		// Получение языка пользователя
-		const userLanguage = window.Telegram.WebApp.initDataUnsafe.user.language_code || 'ru';
+		const userLanguage = window.Telegram.WebApp.initDataUnsafe.user.language_code;
 		//const userLanguage = 'uk';
 		// Определяем переменную colorScheme
 		const colorScheme = window.Telegram.WebApp.colorScheme;
@@ -169,11 +217,13 @@ window.addEventListener('DOMContentLoaded', async () => {
         const weatherDataContainer = document.getElementById('weather-data');
 		const titleContainer = document.getElementById('title');
 		if(userLanguage === "ru") {
-				titleContainer.insertAdjacentHTML('beforeend', 'Прогноз погоды');
+				//Лишний заголовок grm
+				//titleContainer.insertAdjacentHTML('beforeend', 'Прогноз погоды');
 				buttonLabels = ['Сегодня', 'Завтра', 'Послезавтра'];
 			}
 			if(userLanguage === "uk") {
-				titleContainer.insertAdjacentHTML('beforeend', 'Прогноз погоди');
+				//Зайвий заголовок grm
+				//titleContainer.insertAdjacentHTML('beforeend', 'Прогноз погоди');
 				buttonLabels = ['Сьогодні', 'Завтра', 'Післязавтра'];
 			}
         time.forEach((date, index) => {
@@ -181,42 +231,57 @@ window.addEventListener('DOMContentLoaded', async () => {
             button.innerText = buttonLabels[index];
             button.onclick = () => showWeather(index);
             buttonsContainer.appendChild(button);
-
+				
             const weatherHtml_ru = `
-                <div id="date-${index}" class="weather-info" style="display: none;">
-                    <h2 class="date-heading">${formatDate(new Date(date))} (${buttonLabels[index]})</h2>
+                <div id="date-${index}" class="weather-info">
+                    <p class="date-heading">${buttonLabels[index]}</p>
+					<p class="date-heading">${formatDate(new Date(date))}</p>
 					<div class="weather-details">
-						<p><strong>Описание погоды:</strong> ${weatherCodeToDescription_ru(weather_code[index])}</p>
-						<p><strong>Макс. температура:</strong> ${temperature_2m_max[index]}°C</p>
-						<p><strong>Мин. температура:</strong> ${temperature_2m_min[index]}°C</p>
-						<p><strong>Макс. температура по ощущениям:</strong> ${apparent_temperature_max[index]}°C</p>
-						<p><strong>Мин. температура по ощущениям:</strong> ${apparent_temperature_min[index]}°C</p>
-						<p><strong>Вероятность осадков:</strong> ${precipitation_probability_max[index]}%</p>
-						<p><strong>Макс. скорость ветра:</strong> ${wind_speed_10m_max[index]} км/ч</p>
-						<p><strong>Средняя влажность:</strong> ${calculateDailyAverageHumidity(hourlyHumidity, hourlyTimes, date)}%</p>
-						<p><strong>Восход:</strong> ${formatDateTime(new Date(sunrise[index]))}</p>
-						<p><strong>Заката:</strong> ${formatDateTime(new Date(sunset[index]))}</p>
-						<p><strong>Продолжительность дня:</strong> ${Math.round(daylight_duration[index] / 3600)} ч</p>
+						<p> ${weatherCodeToDescription_ru(weather_code[index])}</p>
+						<p>Макс. t°: ${temperature_2m_max[index]}°C</p>
+						<p>Мин. t°: ${temperature_2m_min[index]}°C</p>
+						<p>Вероятность осадков: ${precipitation_probability_max[index]}%</p>
+						<p>Макс. скор. ветра: ${wind_speed_10m_max[index]} км/ч</p>
+						<p>Продолжительность дня: ${Math.round(daylight_duration[index] / 3600)} ч</p>
 					</div>
+					<div id="detailed">
+        				<details class="summ-det">
+            				<summary class="summ" onclick="handleClick()">Подробнее</summary>
+								<div class="weather-details-extended">
+									<p>Макс. t° по ощущениям:</strong> ${apparent_temperature_max[index]}°C</p>
+									<p>Мин. t° по ощущениям:</strong> ${apparent_temperature_min[index]}°C</p>
+									<p>Средняя влажность:</strong> ${calculateDailyAverageHumidity(hourlyHumidity, hourlyTimes, date)}%</p>
+									<p>Восход:</strong> ${formatDateTime(new Date(sunrise[index]))}</p>
+									<p>Заката:</strong> ${formatDateTime(new Date(sunset[index]))}</p>
+								</div>
                 </div>
             `;
 			
 			const weatherHtml_ua = `
-                <div id="date-${index}" class="weather-info" style="display: none;">
-                    <h2 class="date-heading">${formatDate(new Date(date))} (${buttonLabels[index]})</h2>
-			<div class="weather-details">
-				<p><strong>Опис погоди:</strong> ${weatherCodeToDescription_ua(weather_code[index])}</p>
-				<p><strong>Макс. температура:</strong> ${temperature_2m_max[index]}°C</p>
-				<p><strong>Мін. температура:</strong> ${temperature_2m_min[index]}°C</p>
-				<p><strong>Макс. температура по відчуттям:</strong> ${apparent_temperature_max[index]}°C</p>
-				<p><strong>Мін. температура по відчуттям:</strong> ${apparent_temperature_min[index]}°C</p>
-				<p><strong>Можливість опадів:</strong> ${precipitation_probability_max[index]}%</p>
-				<p><strong>Макс. швидкість вітру:</strong> ${wind_speed_10m_max[index]} км/ч</p>
-				<p><strong>Середня вологість:</strong> ${calculateDailyAverageHumidity(hourlyHumidity, hourlyTimes, date)}%</p>
-				<p><strong>Схід сонця:</strong> ${formatDateTime(new Date(sunrise[index]))}</p>
-				<p><strong>Захід сонця:</strong> ${formatDateTime(new Date(sunset[index]))}</p>
-				<p><strong>Тривалість дня:</strong> ${Math.round(daylight_duration[index] / 3600)} г</p>
-			</div>
+                <div id="date-${index}" class="weather-info">
+				    <p class="date-heading">${buttonLabels[index]}</p>
+                    <p class="date-heading">${formatDate(new Date(date))}</p>
+					<div class="weather-details">
+						<p>${weatherCodeToDescription_ua(weather_code[index])}</p>
+						<p>Макс. t°: ${temperature_2m_max[index]}°C
+						Мін. t°: ${temperature_2m_min[index]}°C</p>
+						<p>Вірогідність опадів: ${precipitation_probability_max[index]}%</p>
+						<p>Макс. шв. вітру: ${wind_speed_10m_max[index]} км/ч</p>
+						<p>Тривалість дня: ${Math.round(daylight_duration[index] / 3600)} г</p>
+					</div>
+					<div id="detailed">
+        				<details class="summ-det">
+            				<summary class="summ" onclick="handleClick()">Детальніше</summary>
+            					<div class="weather-details-extended">
+									<p>Макс. t° по відчуттям: ${apparent_temperature_max[index]}°C</p>
+									<p>Мін. t° по відчуттям: ${apparent_temperature_min[index]}°C</p>
+									<p>Середня вологість: ${calculateDailyAverageHumidity(hourlyHumidity, hourlyTimes, date)}%</p>
+									<p>Схід сонця: ${formatDateTime(new Date(sunrise[index]))}</p>
+									<p>Захід сонця: ${formatDateTime(new Date(sunset[index]))}</p>
+								</div>
+        				</details>
+    				</div>
+		
                 </div>
             `;
 			
