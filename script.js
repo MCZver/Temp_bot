@@ -160,14 +160,28 @@ function handleClick() {
 // Инициализация данных при загрузке страницы
 window.addEventListener('DOMContentLoaded', async () => {
     try {
+		/*вывод переменных языка и цветовой схемы отдельно*/
+		let userLanguage; 
+		let colorScheme;
+
 		let buttonLabels = [];
 		window.Telegram.WebApp.ready();
 		window.Telegram.WebApp.expand();
+
+		// Проверка параметра "testmode" в URL, при значении true мы отвязываемся от телеграмм api
+        const urlParams = new URLSearchParams(window.location.search);
+        if (urlParams.get('testmode') === 'true') {
+            userLanguage = 'uk';
+			colorScheme = 'dark'; // Значение может быть 'white' или 'dark'
+        } else	{
+			userLanguage = window.Telegram.WebApp.initDataUnsafe.user.language_code;
+			colorScheme = window.Telegram.WebApp.colorScheme;
+		}
 		// Получение языка пользователя
-		const userLanguage = window.Telegram.WebApp.initDataUnsafe.user.language_code;
+		//const userLanguage = window.Telegram.WebApp.initDataUnsafe.user.language_code;
 		//const userLanguage = 'uk';
 		// Определяем переменную colorScheme
-		const colorScheme = window.Telegram.WebApp.colorScheme;
+		//const colorScheme = window.Telegram.WebApp.colorScheme;
 		//const colorScheme = 'dark'; // Значение может быть 'white' или 'dark'
 		console.log(window.Telegram.WebApp);
 		
@@ -248,11 +262,11 @@ window.addEventListener('DOMContentLoaded', async () => {
         				<details class="summ-det">
             				<summary class="summ" onclick="handleClick()">Подробнее</summary>
 								<div class="weather-details-extended">
-									<p>Макс. t° по ощущениям:</strong> ${apparent_temperature_max[index]}°C</p>
-									<p>Мин. t° по ощущениям:</strong> ${apparent_temperature_min[index]}°C</p>
-									<p>Средняя влажность:</strong> ${calculateDailyAverageHumidity(hourlyHumidity, hourlyTimes, date)}%</p>
-									<p>Восход:</strong> ${formatDateTime(new Date(sunrise[index]))}</p>
-									<p>Заката:</strong> ${formatDateTime(new Date(sunset[index]))}</p>
+									<p>Макс. t° по ощущениям: ${apparent_temperature_max[index]}°C</p>
+									<p>Мин. t° по ощущениям: ${apparent_temperature_min[index]}°C</p>
+									<p>Средняя влажность: ${calculateDailyAverageHumidity(hourlyHumidity, hourlyTimes, date)}%</p>
+									<p>Восход: ${formatDateTime(new Date(sunrise[index]))}</p>
+									<p>Заката: ${formatDateTime(new Date(sunset[index]))}</p>
 								</div>
                 </div>
             `;
@@ -303,6 +317,7 @@ window.addEventListener('DOMContentLoaded', async () => {
         // Показать данные для первого дня по умолчанию
         showWeather(0);
     } catch (error) {
+		//console.clear();
         console.error(error);
         document.body.innerHTML = `<p>Произошла ошибка при обработке запроса: ${error.message}</p>`;
     }
