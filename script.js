@@ -221,7 +221,7 @@ window.addEventListener('DOMContentLoaded', async () => {
 				//titleContainer.insertAdjacentHTML('beforeend', 'Прогноз погоды');
 				buttonLabels = ['Сегодня', 'Завтра', 'Послезавтра'];
 			}
-			if(userLanguage === "uk") {
+			if(userLanguage === "uk" || userLanguage === "en") {
 				//Зайвий заголовок grm
 				//titleContainer.insertAdjacentHTML('beforeend', 'Прогноз погоди');
 				buttonLabels = ['Сьогодні', 'Завтра', 'Післязавтра'];
@@ -288,7 +288,7 @@ window.addEventListener('DOMContentLoaded', async () => {
 			if(userLanguage === "ru") {
 				weatherDataContainer.insertAdjacentHTML('beforeend', weatherHtml_ru);
 			}
-			if(userLanguage === "uk") {
+			if(userLanguage === "uk" || userLanguage === "en") {
 				weatherDataContainer.insertAdjacentHTML('beforeend', weatherHtml_ua);
 			}
 			
