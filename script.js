@@ -234,7 +234,7 @@ window.addEventListener('DOMContentLoaded', async () => {
 				
             const weatherHtml_ru = `
                 <div id="date-${index}" class="weather-info">
-                    <!-- <p> class="date-heading">${buttonLabels[index]}</p> -->
+                    <p> class="date-heading">${buttonLabels[index]}</p>
 					<p> class="date-heading">${formatDate(new Date(date))}</p>
 					<div class="weather-details">
 						<p> ${weatherCodeToDescription_ru(weather_code[index])}</p>
@@ -259,7 +259,7 @@ window.addEventListener('DOMContentLoaded', async () => {
 			
 			const weatherHtml_ua = `
                 <div id="date-${index}" class="weather-info">
-				    <!-- <p class="date-heading">${buttonLabels[index]}</p> --> 
+				    <p class="date-heading">${buttonLabels[index]}</p>
                     <p class="date-heading">${formatDate(new Date(date))}</p>
 					<div class="weather-details">
 						<p>${weatherCodeToDescription_ua(weather_code[index])}</p>
