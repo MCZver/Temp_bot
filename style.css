@@ -210,3 +210,31 @@ button {
     border-bottom-left-radius: 48px;
     border-bottom-right-radius: 48px;
 }
+
+
+/* Центрирование контейнера поиска */
+#search-box {
+    display: flex;
+    justify-content: center; /* Центрирование по горизонтали */
+    /*margin-bottom: 20px; /* Отступ от нижней части */
+    width: 100%; /* Занимает всю ширину */
+}
+
+/* Контейнер для поиска */
+.search-container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    max-width: 500px; /* Ограничение по ширине */
+    border-radius: 8px;
+}
+
+/* Поле ввода */
+#input {
+    flex: 1;
+    padding: 10px;
+    border-radius: 5px;
+    margin-right: 10px;
+    font-size: 18px;
+}

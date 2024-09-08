@@ -174,6 +174,7 @@ window.addEventListener('DOMContentLoaded', async () => {
         const hourlyTimes = weatherData.hourly.time;
 
         // Формирование HTML с кнопками и данными о погоде
+		const searchBox = document.getElementById('search-box');
         const buttonsContainer = document.getElementById('buttons');
         const weatherDataContainer = document.getElementById('weather-data');
 		const titleContainer = document.getElementById('title');
@@ -193,7 +194,7 @@ window.addEventListener('DOMContentLoaded', async () => {
             `;
 
 
-		//searchBox.insertAdjacentHTML('beforeend', SearchHTML);
+		searchBox.insertAdjacentHTML('beforeend', SearchHTML);
 
         time.forEach((date, index) => {
             const button = document.createElement('button');
