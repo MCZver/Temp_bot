@@ -62,19 +62,19 @@ void TG_init(void) {                    // a variable to store telegram message 
         digitalWrite(1, LOW);
       }
 
-      if (msg.text == "/udp") {
-        myBot.sendMessage(msg, "UDP Send test");
-        
-        IPAddress ip = WiFi.localIP();
-        String str_ip_adres = IpAddress2String(ip);
-        int str_len = str_ip_adres.length() + 1;
-        char char_ip[str_len];
-        str_ip_adres.toCharArray(char_ip, str_len);
-
-        udp.beginPacket(SendIP, 2000);
-        udp.write(char_ip, 20);
-        udp.endPacket();
-      }
+//      if (msg.text == "/udp") {
+//        myBot.sendMessage(msg, "UDP Send test");
+//        
+//        IPAddress ip = WiFi.localIP();
+//        String str_ip_adres = IpAddress2String(ip);
+//        int str_len = str_ip_adres.length() + 1;
+//        char char_ip[str_len];
+//        str_ip_adres.toCharArray(char_ip, str_len);
+//
+//        udp.beginPacket(SendIP, 2000);
+//        udp.write(char_ip, 20);
+//        udp.endPacket();
+//      }
     }
   }
 }

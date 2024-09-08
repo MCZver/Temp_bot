@@ -180,6 +180,21 @@ window.addEventListener('DOMContentLoaded', async () => {
 		//Лишний заголовок grm
 		//titleContainer.insertAdjacentHTML('beforeend', 'Прогноз погоды');
 		buttonLabels = translations.buttonLabels[userLanguage];
+
+		const SearchHTML = `
+				<div id="search-box">
+					<div class="search-container">
+                        <!--<button id="settings-button"><i class="fa-solid fa-gear"></i></button>-->
+						<input id="input" type="text" placeholder="   Location">
+						<button id="search-button" class="fa-solid fa-magnifying-glass"></button>
+                        
+					</div>
+				</div>
+            `;
+
+
+		//searchBox.insertAdjacentHTML('beforeend', SearchHTML);
+
         time.forEach((date, index) => {
             const button = document.createElement('button');
             button.innerText = buttonLabels[index];
