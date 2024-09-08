@@ -194,7 +194,7 @@ window.addEventListener('DOMContentLoaded', async () => {
             `;
 
 
-		searchBox.insertAdjacentHTML('beforeend', SearchHTML);
+		//searchBox.insertAdjacentHTML('beforeend', SearchHTML);
 
         time.forEach((date, index) => {
             const button = document.createElement('button');
